@@ -1,0 +1,9 @@
+{
+  "success, submit": "✅",
+  "cancel, wrong": "❌",
+  "add, new": "➕",
+  "delete, remove": "➖",
+  "edit, change": "✏\uFE0F",
+  "settings, options": "⚙️",
+  "list, all": "\uD83D\uDCCB"
+}
