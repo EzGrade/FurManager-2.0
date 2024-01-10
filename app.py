@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 import Handlers
-from Utils.Forms import CreatePost, EditDelay, EditChannels
+from Utils.Forms import CreatePost, EditDelay, EditChannels, AdminPanel
 from Utils.Functions import Text
 from Utils.classes import CallbackClasses
 from loader import dp, bot
@@ -60,6 +60,11 @@ async def add_channel_done_handler(message: Message, state: FSMContext):
 @dp.message(StateFilter(EditChannels.waiting_for_channel_name))
 async def channel_name_handler(message: Message, state: FSMContext):
     await Handlers.channel_handler(message, state)
+
+
+@dp.message(StateFilter(AdminPanel.waiting_for_code))
+async def admin_enter_link_handler(message: Message, state: FSMContext):
+    await Handlers.admin_handle_entered_code(message, state)
 
 
 @dp.message()
@@ -137,6 +142,16 @@ async def add_admins_page_handler(query: CallbackQuery):
 @dp.callback_query(CallbackClasses.GetChannelRequestLink.filter())
 async def get_channel_request_link_handler(query: CallbackQuery):
     await Handlers.get_channel_request_link_handler(query)
+
+
+@dp.callback_query(CallbackClasses.AdminEnterLinkCallback.filter())
+async def admin_enter_link_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.admin_enter_link_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.AdminAcceptRequest.filter())
+async def admin_accept_request_handler(query: CallbackQuery):
+    await Handlers.admin_accept_request_handler(query)
 
 
 if __name__ == '__main__':

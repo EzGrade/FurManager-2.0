@@ -40,7 +40,6 @@ class User:
             if serializer.is_valid():
                 serializer.save()
                 return True
-            print(serializer.errors)
             return False
         except ValidationError:
             return False
@@ -55,6 +54,12 @@ class User:
             return True
         return False
 
+    @staticmethod
+    @sync_to_async
+    def get_user_by_channel(channel: int) -> UserModel:
+        user = UserModel.objects.get(pk=channel.channel_holder.pk)
+        return user
+
 
 class Channel:
 
@@ -63,13 +68,6 @@ class Channel:
     def get_channel(channel_id: int) -> UserModel:
         channel_obj = ChannelModel.objects.get(channel_id=channel_id)
         return channel_obj
-
-    @staticmethod
-    @sync_to_async
-    def get_related_channels(user_id: int) -> typing.List[ChannelModel]:
-        user_obj = UserModel.objects.get(user_id=user_id)
-        channels = ChannelModel.objects.filter(channel_holder=user_obj)
-        return [i.channel_name for i in channels]
 
     @staticmethod
     @sync_to_async
@@ -111,7 +109,7 @@ class Channel:
     def get_channel_request_code(channel_id: int) -> str:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         if channel.request_link is None:
-            channel.request_link = f"{channel.channel_id}{secrets.token_urlsafe(16)}"
+            channel.request_link = f"{abs(channel.channel_id)}{secrets.token_urlsafe(16)}"
             channel.save()
         return channel.request_link
 
@@ -119,9 +117,36 @@ class Channel:
     @sync_to_async
     def update_request_code(channel_id: int) -> bool:
         channel = ChannelModel.objects.get(channel_id=channel_id)
-        channel.request_link = f"{channel.channel_id}{secrets.token_urlsafe(16)}"
+        channel.request_link = f"{abs(channel.channel_id)}{secrets.token_urlsafe(16)}"
         channel.save()
         return True
+
+    @staticmethod
+    @sync_to_async
+    def get_channel_by_request_code(request_code: str) -> ChannelModel:
+        try:
+            channel = ChannelModel.objects.get(request_link=request_code)
+            return channel
+        except ChannelModel.DoesNotExist:
+            return False
+
+    @staticmethod
+    @sync_to_async
+    def add_admin(user_id: int, channel_id: int) -> bool:
+        try:
+            channel = ChannelModel.objects.get(channel_id=channel_id)
+            channel.channel_admins += [user_id]
+            channel.save()
+            return True
+        except ChannelModel.DoesNotExist:
+            return False
+
+    @staticmethod
+    @sync_to_async
+    def get_channels_by_admin(admin_id: int) -> typing.List[ChannelModel]:
+        channels = [{"name": i.channel_name, "id": i.channel_id} for i in
+                    ChannelModel.objects.filter(channel_admins__contains=[admin_id])]
+        return channels
 
 
 class Text:
@@ -133,10 +158,20 @@ class Text:
 
     @staticmethod
     async def get_add_channel_text(user_id: int) -> str:
-        channels = "\n".join(
-            [f"{index + 1}. @{i}" for index, i in enumerate(await Channel.get_related_channels(user_id))])
-        if channels:
-            text = f"Your bots list\n{channels}"
+        channels = await Channel.get_channels_by_holder(user_id)
+        channels_holder_list = channels
+        channels_holder = "\n".join(
+            [f"{index + 1}. @{i['name']}" for index, i in enumerate(channels)])
+        channels = await Channel.get_channels_by_admin(user_id)
+        channels_admin_list = []
+        for i in channels:
+            if i not in channels_holder_list:
+                channels_admin_list.append(i)
+        channels_admin = "\n".join(
+            [f"{index + 1}. @{i['name']}" for index, i in enumerate(channels_admin_list)])
+
+        if channels_holder or channels_admin:
+            text = f"Your bots list\n- You are holder in: \n{channels_holder}\n- You are admin in: \n{channels_admin}"
         else:
             text = "You don't have any channels yet"
         return text

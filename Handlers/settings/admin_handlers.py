@@ -1,9 +1,12 @@
 from urllib.parse import quote
 
-from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, Message
 
 from Markup.settings_markup import AdminMenu
-from Utils.Functions import Channel
+from Utils import Forms
+from Utils.Functions import Channel, User
+from loader import bot
 
 
 async def add_admins_handler(query: CallbackQuery):
@@ -24,3 +27,39 @@ async def get_channel_request_link_handler(query: CallbackQuery):
         f"\nThis code will work only once, also you must accept request from admin",
         reply_markup=AdminMenu.get_admin_menu(query.from_user.id).as_markup(),
         parse_mode="Markdown")
+
+
+async def admin_enter_link_handler(query: CallbackQuery, state: FSMContext):
+    await query.message.edit_text("Enter link")
+    await state.set_state(Forms.AdminPanel.waiting_for_code)
+
+
+async def admin_handle_entered_code(message: Message, state: FSMContext):
+    code = message.text
+    channel = await Channel.get_channel_by_request_code(code)
+    channel_holder = await User.get_user_by_channel(channel)
+    if channel:
+        if message.from_user.username is not None:
+            text = f"@{message.from_user.username} wants to get access to your channel"
+        else:
+            text = f"Unknown({message.from_user.id}) wants to get access to your channel"
+        await message.answer(text="Channel found, wait for its holder to accept your request")
+        await bot.send_message(chat_id=channel_holder.user_id,
+                               text=f"User {message.from_user.id} wants to get access to your channel",
+                               reply_markup=AdminMenu.accept_new_admin(user_id=message.from_user.id,
+                                                                       channel_id=channel.channel_id).as_markup())
+    else:
+        await message.answer(text="Channel not found")
+
+
+async def admin_accept_request_handler(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    user_obj = await User.get_user(user_id)
+    await Channel.add_admin(user_id, channel_id)
+    if channel_id not in user_obj.channel_id:
+        data = {
+            "channel_id": user_obj.channel_id + [channel_id]
+        }
+        await User.update_user(user_id=user_id, user_data=data)
+    await query.message.edit_text("Request accepted")

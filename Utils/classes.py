@@ -42,6 +42,17 @@ class CallbackClasses:
         user_id: int
         page: int
 
+    class AdminEnterLinkCallback(CallbackData, prefix="admin_enter_link"):
+        user_id: int
+
     class GetChannelRequestLink(CallbackData, prefix="get_channel_request_link"):
         user_id: int
         channel_id: int
+
+    class AdminAcceptRequest(CallbackData, prefix="admin_accept_request"):
+        user_id: int
+        channel_id: int
+
+    class AdminDeclineRequest(CallbackData, prefix="admin_decline_request"):
+        user_id: int
+

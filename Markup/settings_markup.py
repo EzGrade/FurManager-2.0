@@ -81,15 +81,21 @@ class AdminMenu:
     @staticmethod
     def get_admin_menu(user_id: int) -> InlineKeyboardBuilder:
         keyboard = InlineKeyboardBuilder()
+        keyboard.button(text="➡️Enter Code", callback_data=CallbackClasses.AdminEnterLinkCallback(user_id=user_id))
         keyboard.button(text="➕Add admin", callback_data=CallbackClasses.AddAdminDoneCallback(user_id=user_id, page=1))
         keyboard.button(text="➖Remove admin", callback_data=CallbackClasses.AddChannelDoneCallback(user_id=user_id))
         keyboard.button(text="🔙Back", callback_data=CallbackClasses.SettingsMenuCallback(user_id=user_id))
+        keyboard.adjust(1, 2, 1)
         return keyboard
 
     @staticmethod
     async def get_add_admin_menu(user_id: int, page: int) -> InlineKeyboardBuilder:
         keyboard = InlineKeyboardBuilder()
-        channels = await Channel.get_channels_by_holder(user_id) * 20
+        channels = await Channel.get_channels_by_holder(user_id)
+        if not channels:
+            keyboard.button(text="🔙Back", callback_data=CallbackClasses.AddAdminsCallback(user_id=user_id))
+            keyboard.adjust(1)
+            return keyboard
         channels_set = [[channels[i:i + 6]] for i in range(0, len(channels), 6)]
         for set_page in channels_set[page - 1]:
             for channel in set_page:
@@ -126,4 +132,12 @@ class AdminMenu:
                 keyboard.adjust(3, len(channels_set[page - 1][0]) - 3, 2, 1)
             else:
                 keyboard.adjust(3, 3, 2, 1)
+        return keyboard
+
+    @staticmethod
+    def accept_new_admin(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
+        keyboard = InlineKeyboardBuilder()
+        keyboard.button(text="✅Accept",
+                        callback_data=CallbackClasses.AdminAcceptRequest(user_id=user_id, channel_id=channel_id))
+        keyboard.button(text="❌Decline", callback_data=CallbackClasses.AdminDeclineRequest(user_id=user_id))
         return keyboard

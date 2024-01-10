@@ -15,3 +15,8 @@ class EditDelay(StatesGroup):
 
 class EditChannels(StatesGroup):
     waiting_for_channel_name = State()
+
+
+class AdminPanel(StatesGroup):
+    waiting_for_code = State()
+
