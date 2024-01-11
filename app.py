@@ -172,5 +172,19 @@ async def add_channel_done_handler(message: Message, state: FSMContext):
     await Handlers.wait_for_channel_name(message, state)
 
 
+@dp.callback_query(CallbackClasses.ChannelCallbacks.EditChannelCallback.filter())
+async def edit_channel_handler(query: CallbackQuery):
+    await Handlers.edit_main_menu(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayCallback.filter())
+async def edit_channel_delay_handler(query: CallbackQuery):
+    await Handlers.edit_channel_delay_handler(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue.filter())
+async def edit_channel_delay_value_handler(query: CallbackQuery):
+    await Handlers.edit_channel_delay_value_handler(query)
+
 if __name__ == '__main__':
     asyncio.run(dp.start_polling(bot))

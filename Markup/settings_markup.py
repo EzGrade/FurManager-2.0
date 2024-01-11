@@ -160,7 +160,49 @@ class EditSingleChannelMenu:
     @staticmethod
     async def get_main_menu(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
         keyboard = InlineKeyboardBuilder()
-        keyboard.button(text="✏️Edit delay")
+        keyboard.button(text="✏️Edit delay",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayCallback(
+                            user_id=user_id, channel_id=channel_id))
+        keyboard.button(text="🔙Back",
+                        callback_data=CallbackClasses.ChannelCallbacks.EditChannelPageCallback(user_id=user_id, page=1))
+        keyboard.adjust(1, 2, 1)
+        return keyboard
+
+    @staticmethod
+    async def get_delay_menu(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
+        curren_delay = await Channel.get_current_delay(channel_id)
+        keyboard = InlineKeyboardBuilder()
+        keyboard.button(text="-10",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            delay=curren_delay - 10)
+                        )
+        keyboard.button(text="+10",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            delay=curren_delay + 10)
+                        )
+        keyboard.button(text="-5",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            delay=curren_delay - 5)
+                        )
+        keyboard.button(text="+5",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            delay=curren_delay + 5)
+                        )
+        keyboard.button(text=f"Current: {curren_delay}", callback_data=CallbackClasses.EmptyCallback())
+        keyboard.button(text="🔙Back", callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
+            user_id=user_id,
+            channel_id=channel_id
+        ))
+        keyboard.adjust(2, 2, 1)
+        return keyboard
 
 
 class AdminMenu:

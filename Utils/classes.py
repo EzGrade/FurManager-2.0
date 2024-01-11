@@ -1,8 +1,10 @@
 from aiogram.filters.callback_data import CallbackData
-from dataclasses import dataclass
 
 
 class CallbackClasses:
+    class EmptyCallback(CallbackData, prefix="empty"):
+        pass
+
     class AdminCallbacks:
         class AddAdminsCallback(CallbackData, prefix="add_admins"):
             user_id: int
@@ -79,9 +81,15 @@ class CallbackClasses:
             user_id: int
             channel_id: int
 
-    class DelayCallbacks:
-        class DelayCallback(CallbackData, prefix="delay"):
+    class EditSingleChannelCallbacks:
+        class EditChannelDelayCallback(CallbackData, prefix="edit_channel_delay"):
             user_id: int
+            channel_id: int
+
+        class EditChannelDelayValue(CallbackData, prefix="edit_channel_delay_value"):
+            user_id: int
+            channel_id: int
+            delay: int
 
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):

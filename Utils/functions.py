@@ -65,7 +65,7 @@ class Channel:
 
     @staticmethod
     @sync_to_async
-    def get_channel(channel_id: int) -> UserModel:
+    def get_channel(channel_id: int) -> ChannelModel:
         channel_obj = ChannelModel.objects.get(channel_id=channel_id)
         return channel_obj
 
@@ -85,6 +85,17 @@ class Channel:
                 return {"message": "User is holder"}
             except UserModel.DoesNotExist:
                 return {"message": "Channel already exists"}
+
+    @staticmethod
+    @sync_to_async
+    def update_channel(channel_id: int, channel_data: typing.Dict) -> bool:
+        channel_obj = ChannelModel.objects.get(channel_id=channel_id)
+        serializer = ChannelSerializer(channel_obj, data=channel_data)
+        if serializer.is_valid():
+            serializer.save()
+            return True
+        print(serializer.errors)
+        return False
 
     @staticmethod
     @sync_to_async
@@ -178,6 +189,12 @@ class Channel:
             return False
         except ChannelModel.DoesNotExist or UserModel.DoesNotExist:
             return False
+
+    @staticmethod
+    @sync_to_async
+    def get_current_delay(channel_id: int) -> int:
+        channel = ChannelModel.objects.get(channel_id=channel_id)
+        return channel.channel_delay
 
 
 class Text:
