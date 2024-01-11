@@ -23,6 +23,7 @@ class AddChannelMenu:
         keyboard.button(text="➕Add channel", callback_data=CallbackClasses.AddChannelCallback(user_id=user_id))
         keyboard.button(text="➖Remove channel", callback_data=CallbackClasses.RemoveChannelCallback(user_id=user_id))
         keyboard.button(text="🔙Back", callback_data=CallbackClasses.SettingsMenuCallback(user_id=user_id))
+        keyboard.adjust(2, 1)
         return keyboard
 
     @staticmethod
