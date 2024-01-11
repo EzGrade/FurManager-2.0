@@ -1,4 +1,5 @@
 from aiogram.filters.callback_data import CallbackData
+from dataclasses import dataclass
 
 
 class CallbackClasses:
@@ -24,6 +25,27 @@ class CallbackClasses:
         class AdminDeclineRequest(CallbackData, prefix="admin_decline_request"):
             user_id: int
 
+        class AdminRemoveAdmin(CallbackData, prefix="admin_remove_admin"):
+            user_id: int
+
+        class ChannelRemoveAdmin(CallbackData, prefix="channel_remove_admin"):
+            user_id: int
+            channel_id: int
+
+        class AdminRemoveAdminDone(CallbackData, prefix="admin_remove_admin_done"):
+            user_id: int
+            channel_id: int
+            admin_id: int
+
+        class AdminRemoveAdminPage(CallbackData, prefix="admin_remove_admin_page"):
+            user_id: int
+            channel_id: int
+            page: int
+
+        class AdminChannelRemoveAdminPage(CallbackData, prefix="admin_channel_remove_admin_page"):
+            user_id: int
+            page: int
+
     class ChannelCallbacks:
         class EditChannelsCallback(CallbackData, prefix="edit_channels"):
             user_id: int
@@ -46,6 +68,14 @@ class CallbackClasses:
             page: int
 
         class GetChannelRequestLink(CallbackData, prefix="get_channel_request_link"):
+            user_id: int
+            channel_id: int
+
+        class EditChannelPageCallback(CallbackData, prefix="edit_channel_page"):
+            user_id: int
+            page: int
+
+        class EditChannelCallback(CallbackData, prefix="edit_channel"):
             user_id: int
             channel_id: int
 

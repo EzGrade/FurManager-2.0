@@ -6,9 +6,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 import Handlers
-from Utils.Forms import CreatePost, EditDelay, EditChannels, AdminPanel
-from Utils.Functions import Text
 from Utils.classes import CallbackClasses
+from Utils.forms import CreatePost, EditChannels, AdminPanel
+from Utils.functions import Text
 from loader import dp, bot
 
 
@@ -47,16 +47,6 @@ async def tags_handler(message: Message, state: FSMContext):
     await Handlers.tags_handler(message, state)
 
 
-@dp.message(StateFilter(EditDelay.waiting_for_post_delay))
-async def post_delay_submit_handler(message: Message, state: FSMContext):
-    await Handlers.post_delay_submit_handler(message, state)
-
-
-@dp.message(StateFilter(CallbackClasses.AddChannelDoneCallback))
-async def add_channel_done_handler(message: Message, state: FSMContext):
-    await Handlers.channel_handler(message, state)
-
-
 @dp.message(StateFilter(EditChannels.waiting_for_channel_name))
 async def channel_name_handler(message: Message, state: FSMContext):
     await Handlers.channel_handler(message, state)
@@ -77,81 +67,109 @@ async def callback_handler(query: Message, state: FSMContext):
     await Handlers.submit_handler(query, state)
 
 
-@dp.callback_query(CallbackClasses.DelayCallback.filter())
-async def post_delay_handler(message: Message, state: FSMContext):
-    await Handlers.post_delay_handler(message, state)
-
-
-@dp.callback_query(CallbackClasses.EditChannelsCallback.filter())
+@dp.callback_query(CallbackClasses.ChannelCallbacks.EditChannelsCallback.filter())
 async def edit_channels_handler(message: Message):
     await Handlers.get_channels_list(message)
 
 
-@dp.callback_query(CallbackClasses.SettingsMenuCallback.filter())
+@dp.callback_query(CallbackClasses.SettingsCallbacks.SettingsMenuCallback.filter())
 async def settings_menu_handler(query: CallbackQuery):
     await Handlers.settings_handler(query)
 
 
-@dp.callback_query(CallbackClasses.AddChannelCallback.filter())
+@dp.callback_query(CallbackClasses.ChannelCallbacks.AddChannelCallback.filter())
 async def add_channel_handler(query: CallbackQuery):
     await Handlers.add_bot_as_admin(query)
 
 
-@dp.callback_query(CallbackClasses.CancelCallback.filter())
+@dp.callback_query(CallbackClasses.CommandCallbacks.CancelCallback.filter())
 async def cancel_callback_handler(query: CallbackQuery, state: FSMContext):
     await Handlers.cancel_handler(query, state)
 
 
-@dp.callback_query(CallbackClasses.AddChannelDoneCallback.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.AdminRemoveAdmin.filter())
 async def add_channel_done_handler(query: CallbackQuery, state: FSMContext):
-    await Handlers.add_bot_as_admin_process(query, state)
+    await Handlers.admin_remove_markup_handler(query)
 
 
-@dp.callback_query(CallbackClasses.RemoveChannelCallback.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.ChannelRemoveAdmin.filter())
+async def admins_to_remove_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.admin_remove_handler(query)
+
+
+@dp.callback_query(CallbackClasses.ChannelCallbacks.RemoveChannelCallback.filter())
 async def remove_channel_handler(query: CallbackQuery):
     await Handlers.remove_channel_handler(query, page=1)
 
 
-@dp.callback_query(CallbackClasses.RemovePageCallback.filter())
+@dp.callback_query(CallbackClasses.ChannelCallbacks.RemovePageCallback.filter())
 async def page_handler(query: CallbackQuery, state: FSMContext):
     page = int(query.data.split(":")[2])
     await Handlers.remove_channel_handler(query, page)
 
 
-@dp.callback_query(CallbackClasses.RemoveChannelDoneCallback.filter())
+@dp.callback_query(CallbackClasses.ChannelCallbacks.RemoveChannelDoneCallback.filter())
 async def remove_channel_done_handler(query: CallbackQuery):
     await Handlers.remove_channel_done_handler(query)
 
 
-@dp.callback_query(CallbackClasses.AddAdminsCallback.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.AddAdminsCallback.filter())
 async def add_admins_handler(query: CallbackQuery):
     await Handlers.add_admins_handler(query)
 
 
-@dp.callback_query(CallbackClasses.AddAdminDoneCallback.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.AddAdminDoneCallback.filter())
 async def add_admins_done_handler(query: CallbackQuery):
     await Handlers.add_admins_done_handler(query, page=1)
 
 
-@dp.callback_query(CallbackClasses.AddAdminPageCallback.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.AddAdminPageCallback.filter())
 async def add_admins_page_handler(query: CallbackQuery):
     page = int(query.data.split(":")[2])
     await Handlers.add_admins_done_handler(query, page)
 
 
-@dp.callback_query(CallbackClasses.GetChannelRequestLink.filter())
+@dp.callback_query(CallbackClasses.ChannelCallbacks.GetChannelRequestLink.filter())
 async def get_channel_request_link_handler(query: CallbackQuery):
     await Handlers.get_channel_request_link_handler(query)
 
 
-@dp.callback_query(CallbackClasses.AdminEnterLinkCallback.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.AdminEnterLinkCallback.filter())
 async def admin_enter_link_handler(query: CallbackQuery, state: FSMContext):
     await Handlers.admin_enter_link_handler(query, state)
 
 
-@dp.callback_query(CallbackClasses.AdminAcceptRequest.filter())
+@dp.callback_query(CallbackClasses.AdminCallbacks.AdminAcceptRequest.filter())
 async def admin_accept_request_handler(query: CallbackQuery):
     await Handlers.admin_accept_request_handler(query)
+
+
+@dp.callback_query(CallbackClasses.ChannelCallbacks.EditChannelPageCallback.filter())
+async def edit_channel_page_handler(query: CallbackQuery):
+    page = int(query.data.split(":")[2])
+    await Handlers.edit_channel_page_handler(query, page)
+
+
+@dp.callback_query(CallbackClasses.AdminCallbacks.AdminRemoveAdminPage.filter())
+async def admin_remove_admin_page_handler(query: CallbackQuery):
+    page = int(query.data.split(":")[3])
+    await Handlers.admin_remove_admin_page_handler(query, page)
+
+
+@dp.callback_query(CallbackClasses.AdminCallbacks.AdminChannelRemoveAdminPage.filter())
+async def admin_channel_remove_admin_page_handler(query: CallbackQuery):
+    page = int(query.data.split(":")[2])
+    await Handlers.admin_channel_remove_admin_page_handler(query, page)
+
+
+@dp.callback_query(CallbackClasses.AdminCallbacks.AdminRemoveAdminDone.filter())
+async def admin_remove_admin_done_handler(query: CallbackQuery):
+    await Handlers.admin_remove_admin_done_handler(query)
+
+
+@dp.callback_query(CallbackClasses.ChannelCallbacks.AddChannelDoneCallback.filter())
+async def add_channel_done_handler(message: Message, state: FSMContext):
+    await Handlers.wait_for_channel_name(message, state)
 
 
 if __name__ == '__main__':

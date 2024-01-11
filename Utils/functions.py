@@ -99,6 +99,13 @@ class Channel:
     def delete_channel_by_id(channel_id: int) -> bool:
         try:
             channel = ChannelModel.objects.get(channel_id=channel_id)
+            for user_id in channel.channel_admins:
+                user = UserModel.objects.get(user_id=user_id)
+                user.channel_id.remove(channel_id)
+                user.save()
+            channel_holder = UserModel.objects.get(pk=channel.channel_holder.pk)
+            channel_holder.channel_id.remove(channel_id)
+            channel_holder.save()
             channel.delete()
             return True
         except ChannelModel.DoesNotExist:
@@ -109,7 +116,7 @@ class Channel:
     def get_channel_request_code(channel_id: int) -> str:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         if channel.request_link is None:
-            channel.request_link = f"{abs(channel.channel_id)}{secrets.token_urlsafe(16)}"
+            channel.request_link = f"{channel.channel_id[1:]}{secrets.token_urlsafe(16)}"
             channel.save()
         return channel.request_link
 
@@ -117,7 +124,7 @@ class Channel:
     @sync_to_async
     def update_request_code(channel_id: int) -> bool:
         channel = ChannelModel.objects.get(channel_id=channel_id)
-        channel.request_link = f"{abs(channel.channel_id)}{secrets.token_urlsafe(16)}"
+        channel.request_link = f"{channel.channel_id[1:]}{secrets.token_urlsafe(16)}"
         channel.save()
         return True
 
@@ -148,12 +155,36 @@ class Channel:
                     ChannelModel.objects.filter(channel_admins__contains=[admin_id])]
         return channels
 
+    @staticmethod
+    @sync_to_async
+    def get_admins_by_channel(channel_id: int) -> typing.List[UserModel]:
+        channel = ChannelModel.objects.get(channel_id=channel_id)
+        admins = [{"name": UserModel.objects.get(user_id=i).user_name, "id": UserModel.objects.get(user_id=i).user_id}
+                  for i in channel.channel_admins]
+        return admins
+
+    @staticmethod
+    @sync_to_async
+    def remove_admin(user_id: int, channel_id: int, admin_id: int) -> bool:
+        try:
+            channel = ChannelModel.objects.get(channel_id=channel_id)
+            if user_id == channel.channel_holder.user_id:
+                channel.channel_admins.remove(admin_id)
+                channel.save()
+                admin = UserModel.objects.get(user_id=admin_id)
+                admin.channel_id.remove(channel_id)
+                admin.save()
+                return True
+            return False
+        except ChannelModel.DoesNotExist or UserModel.DoesNotExist:
+            return False
+
 
 class Text:
     @staticmethod
     async def get_settings_text(user_id: int) -> str:
         user_obj = await User.get_user(user_id)
-        text = f'⚙️ Settings Menu\n⏳Delay: {user_obj.post_delay} minutes'
+        text = f'⚙️ Settings Menu\nBots number: {len(user_obj.channel_id)}'
         return text
 
     @staticmethod

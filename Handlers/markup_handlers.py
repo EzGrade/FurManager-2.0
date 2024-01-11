@@ -2,7 +2,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 
-from Utils.Forms import CreatePost
+from Utils.forms import CreatePost
 
 
 async def handle_markup(message: Message, state: FSMContext):

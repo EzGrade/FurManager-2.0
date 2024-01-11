@@ -8,4 +8,3 @@ class UserModel(models.Model):
     user_name = models.CharField(max_length=50, blank=False, null=False, db_index=True)
     post_delay = models.IntegerField(blank=False, null=False, default=1)
     channel_id = ArrayField(models.BigIntegerField(), blank=True, null=True, default=list)
-    request_link = models.CharField(max_length=100, blank=True, null=True)

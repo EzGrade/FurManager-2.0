@@ -9,10 +9,6 @@ class CreatePost(StatesGroup):
     waiting_for_submit = State()
 
 
-class EditDelay(StatesGroup):
-    waiting_for_post_delay = State()
-
-
 class EditChannels(StatesGroup):
     waiting_for_channel_name = State()
 

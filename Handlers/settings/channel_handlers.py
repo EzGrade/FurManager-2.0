@@ -2,9 +2,9 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from Markup.settings_markup import AddChannelMenu, RemoveChannelMenu
-from Utils import Forms
-from Utils.Functions import Channel, User, Text
+from Markup.settings_markup import AddChannelMenu, RemoveChannelMenu, EditChannelMenu
+from Utils import forms
+from Utils.functions import Channel, User, Text
 from loader import bot
 
 
@@ -14,14 +14,14 @@ async def get_channels_list(query: CallbackQuery):
                                   reply_markup=AddChannelMenu.add_channel_menu(query.from_user.id).as_markup())
 
 
+async def wait_for_channel_name(query: CallbackQuery, state: FSMContext):
+    await query.message.edit_text("Enter channel name or link")
+    await state.set_state(forms.EditChannels.waiting_for_channel_name)
+
+
 async def add_bot_as_admin(query: CallbackQuery):
     await query.message.edit_text("Please, add bot as admin to your channel and press 'Done' button",
                                   reply_markup=AddChannelMenu.add_process_menu(query.from_user.id).as_markup())
-
-
-async def add_bot_as_admin_process(query: CallbackQuery, state: FSMContext):
-    await query.message.edit_text("Write your channel name")
-    await state.set_state(Forms.EditChannels.waiting_for_channel_name)
 
 
 async def channel_handler(message: Message, state: FSMContext):
@@ -58,7 +58,6 @@ async def channel_handler(message: Message, state: FSMContext):
                 await message.answer(
                     f"✅Well done! Bot added to your list of channels.\n{channels_text}",
                     reply_markup=AddChannelMenu.add_channel_menu(message.from_user.id).as_markup())
-                await state.clear()
             elif not result:
                 await message.answer(f"❌Something went wrong. Please try again later\n{channels_text}",
                                      reply_markup=AddChannelMenu.add_channel_menu(message.from_user.id).as_markup())
@@ -74,6 +73,8 @@ async def channel_handler(message: Message, state: FSMContext):
         await message.answer(
             f"❌The bot is not a member of this channel. Please add the bot to the channel and try again.\n{channels_text}",
             reply_markup=AddChannelMenu.add_channel_menu(message.from_user.id).as_markup())
+    await state.clear()
+    return
 
 
 async def remove_channel_handler(query: CallbackQuery, page: int):
@@ -92,3 +93,9 @@ async def remove_channel_done_handler(query: CallbackQuery):
     else:
         await query.message.edit_text("❌Something went wrong. Please try again later",
                                       reply_markup=AddChannelMenu.add_channel_menu(user_id).as_markup())
+
+
+async def edit_channel_page_handler(query: CallbackQuery, page: int):
+    keyboard = await EditChannelMenu.get_edit_channel_menu(
+        user_id=query.from_user.id, page=page)
+    await query.message.edit_text("Choose channel to edit", reply_markup=keyboard.as_markup())

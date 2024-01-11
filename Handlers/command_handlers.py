@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 
 from Markup.main_markup import get_main_menu
 from Markup.settings_markup import SettingsMenu
-from Utils import Functions
+from Utils import functions
 
 
 async def start_handler(message: Message):
@@ -12,7 +12,7 @@ async def start_handler(message: Message):
         "user_name": message.from_user.username if message.from_user.username is not None else "Unknown",
         "post_delay": 1
     }
-    result = await Functions.User.create_user(data)
+    result = await functions.User.create_user(data)
     if result:
         await message.answer("Hello! I'm here to help you with posting in your Telegram channel",
                              reply_markup=get_main_menu().as_markup())
@@ -25,7 +25,7 @@ async def help_handler(message: Message):
 
 
 async def settings_handler(message: Message):
-    settings_text = await Functions.Text.get_settings_text(message.from_user.id)
+    settings_text = await functions.Text.get_settings_text(message.from_user.id)
     if isinstance(message, Message):
         await message.answer(settings_text,
                              reply_markup=SettingsMenu.get_settings_menu(message.from_user.id).as_markup())

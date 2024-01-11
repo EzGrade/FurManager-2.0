@@ -2,8 +2,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from Markup import get_submit_menu
-from Utils import Functions
-from Utils.Forms import CreatePost
+from Utils import functions
+from Utils.forms import CreatePost
 
 
 async def photo_handler(message: Message, state: FSMContext):
