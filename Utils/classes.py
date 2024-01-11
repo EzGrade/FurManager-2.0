@@ -49,11 +49,14 @@ class CallbackClasses:
             user_id: int
             channel_id: int
 
-    class DelayCallback(CallbackData, prefix="delay"):
-        user_id: int
+    class DelayCallbacks:
+        class DelayCallback(CallbackData, prefix="delay"):
+            user_id: int
 
-    class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
-        user_id: int
+    class SettingsCallbacks:
+        class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
+            user_id: int
 
-    class CancelCallback(CallbackData, prefix="cancel"):
-        user_id: int
+    class CommandCallbacks:
+        class CancelCallback(CallbackData, prefix="cancel"):
+            user_id: int
