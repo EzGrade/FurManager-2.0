@@ -3,7 +3,7 @@ import os
 import django
 from django.conf import settings
 
-from .Forms import *
+from .forms import *
 
 if not settings.configured:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_orm.django_orm.settings')
