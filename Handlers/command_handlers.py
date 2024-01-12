@@ -14,14 +14,14 @@ async def start_handler(message: Message):
     }
     result = await functions.User.create_user(data)
     if result:
-        await message.answer("Hello! I'm here to help you with posting in your Telegram channel",
+        await message.answer("*:･ﾟ｡hello *ੈ✩‧₊˚ I'm here to help you with posting in your Telegram channel (´｡•᎑•`)っ",
                              reply_markup=get_main_menu().as_markup())
     else:
-        await message.answer("Welcome back", reply_markup=get_main_menu().as_markup())
+        await message.answer("Welcome back ⸜(｡˃ ᵕ ˂ )⸝", reply_markup=get_main_menu().as_markup())
 
 
 async def help_handler(message: Message):
-    await message.answer("Send me pictures and I will post them in your channel")
+    await message.answer("⏳Send me pictures and I will post them in your channel")
 
 
 async def settings_handler(message: Message):
@@ -32,8 +32,3 @@ async def settings_handler(message: Message):
     elif isinstance(message, CallbackQuery):
         await message.message.edit_text(settings_text,
                                         reply_markup=SettingsMenu.get_settings_menu(message.from_user.id).as_markup())
-
-
-async def cancel_handler(message: Message, state: FSMContext):
-    await message.answer("Canceled")
-    await state.clear()

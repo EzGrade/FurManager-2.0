@@ -1,14 +1,14 @@
 from rest_framework import serializers
 
-from UserModel.models import UserModel
+from ChannelModel.models import ChannelModel
 from .models import PostsModel
 
 
 class PostSerializer(serializers.ModelSerializer):
     photo = serializers.CharField(allow_blank=True, allow_null=True)
-    author = serializers.CharField(allow_blank=True, allow_null=True)
-    tags = serializers.CharField(allow_blank=True, allow_null=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=UserModel.objects.all())
+    caption = serializers.CharField(allow_blank=True, allow_null=True)
+    channels = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=ChannelModel.objects.all(),
+                                                  required=False)
 
     def create(self, validated_data):
         return PostsModel.objects.create(**validated_data)

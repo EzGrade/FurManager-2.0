@@ -1,66 +1,8 @@
-from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from Utils.classes import CallbackClasses
+from Utils.classes import Keyboard
 from Utils.functions import Channel
-
-
-class Keyboard:
-
-    def __init__(
-            self,
-            elements_set: list,
-            keyboard: InlineKeyboardBuilder,
-            button_page: CallbackData,
-            button_back: CallbackData
-    ):
-        self.elements_set = elements_set
-        self.keyboard = keyboard
-        self.button_page = button_page
-        self.button_back = button_back
-
-    # noinspection PyCallingNonCallable
-    def get_keyboard(self, user_id: int, page: int) -> InlineKeyboardBuilder:
-        if len(self.elements_set) > 1:
-            if page != 1:
-                self.keyboard.button(text="⬅️Previous",
-                                     callback_data=self.button_page(
-                                         user_id=user_id,
-                                         page=page - 1))
-            else:
-                self.keyboard.button(text="Last Page",
-                                     callback_data=self.button_page(
-                                         user_id=user_id,
-                                         page=len(
-                                             self.elements_set)))
-            if page != len(self.elements_set):
-                self.keyboard.button(text="➡️Next",
-                                     callback_data=self.button_page(
-                                         user_id=user_id,
-                                         page=page + 1))
-            else:
-                self.keyboard.button(text="First Page",
-                                     callback_data=self.button_page(
-                                         user_id=user_id,
-                                         page=1))
-
-        self.keyboard.button(text="🔙Back",
-                             callback_data=self.button_back(user_id=user_id))
-        if len(self.elements_set) == 1:
-            if len(self.elements_set[0][0]) <= 3:
-                self.keyboard.adjust(len(self.elements_set[0][0]), 1)
-            elif len(self.elements_set[0][0]) <= 6:
-                self.keyboard.adjust(3, len(self.elements_set[0][0]) - 3, 1)
-            else:
-                self.keyboard.adjust(3, 3, 1)
-        else:
-            if len(self.elements_set[page - 1][0]) <= 3:
-                self.keyboard.adjust(len(self.elements_set[page - 1][0]), 2, 1)
-            elif len(self.elements_set[page - 1][0]) <= 6:
-                self.keyboard.adjust(3, len(self.elements_set[page - 1][0]) - 3, 2, 1)
-            else:
-                self.keyboard.adjust(3, 3, 2, 1)
-        return self.keyboard
 
 
 class SettingsMenu:
@@ -146,7 +88,6 @@ class EditChannelMenu:
                                 callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
                                     user_id=user_id,
                                     channel_id=channel["id"]))
-
         keyboard_adjuster = Keyboard(
             elements_set=channels_set,
             keyboard=keyboard,
@@ -160,43 +101,51 @@ class EditSingleChannelMenu:
     @staticmethod
     async def get_main_menu(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
         keyboard = InlineKeyboardBuilder()
+        channel_obj = await Channel.get_channel(channel_id)
+        if channel_obj.active:
+            active_text = "❌Disable"
+        else:
+            active_text = "✅Enable"
+        keyboard.button(text=active_text,
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelActiveCallback(
+                            user_id=user_id, channel_id=channel_id))
         keyboard.button(text="✏️Edit delay",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayCallback(
                             user_id=user_id, channel_id=channel_id))
         keyboard.button(text="🔙Back",
                         callback_data=CallbackClasses.ChannelCallbacks.EditChannelPageCallback(user_id=user_id, page=1))
-        keyboard.adjust(1, 2, 1)
+        keyboard.adjust(2, 1)
         return keyboard
 
     @staticmethod
     async def get_delay_menu(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
         curren_delay = await Channel.get_current_delay(channel_id)
         keyboard = InlineKeyboardBuilder()
-        keyboard.button(text="-10",
+        keyboard.button(text="➖10",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
                             user_id=user_id,
                             channel_id=channel_id,
                             delay=curren_delay - 10)
                         )
-        keyboard.button(text="+10",
+        keyboard.button(text="➕10",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
                             user_id=user_id,
                             channel_id=channel_id,
                             delay=curren_delay + 10)
                         )
-        keyboard.button(text="-5",
+        keyboard.button(text="➖5",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
                             user_id=user_id,
                             channel_id=channel_id,
                             delay=curren_delay - 5)
                         )
-        keyboard.button(text="+5",
+        keyboard.button(text="➕5",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
                             user_id=user_id,
                             channel_id=channel_id,
                             delay=curren_delay + 5)
                         )
-        keyboard.button(text=f"Current: {curren_delay}", callback_data=CallbackClasses.EmptyCallback())
+        keyboard.button(text=f"Current: {curren_delay} minutes", callback_data=CallbackClasses.EmptyCallback())
         keyboard.button(text="🔙Back", callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
             user_id=user_id,
             channel_id=channel_id

@@ -15,12 +15,12 @@ async def get_channels_list(query: CallbackQuery):
 
 
 async def wait_for_channel_name(query: CallbackQuery, state: FSMContext):
-    await query.message.edit_text("Enter channel name or link")
+    await query.message.edit_text("⌨️Enter channel name or link")
     await state.set_state(forms.EditChannels.waiting_for_channel_name)
 
 
 async def add_bot_as_admin(query: CallbackQuery):
-    await query.message.edit_text("Please, add bot as admin to your channel and press 'Done' button",
+    await query.message.edit_text("⏳Please, add bot as admin to your channel and press 'Done' button",
                                   reply_markup=AddChannelMenu.add_process_menu(query.from_user.id).as_markup())
 
 
@@ -80,7 +80,7 @@ async def channel_handler(message: Message, state: FSMContext):
 async def remove_channel_handler(query: CallbackQuery, page: int):
     keyboard = await RemoveChannelMenu.remove_channel_menu(
         user_id=query.from_user.id, page=page)
-    await query.message.edit_text("Choose channel to remove", reply_markup=keyboard.as_markup())
+    await query.message.edit_text("👉Choose channel to remove", reply_markup=keyboard.as_markup())
 
 
 async def remove_channel_done_handler(query: CallbackQuery):
@@ -98,4 +98,4 @@ async def remove_channel_done_handler(query: CallbackQuery):
 async def edit_channel_page_handler(query: CallbackQuery, page: int):
     keyboard = await EditChannelMenu.get_edit_channel_menu(
         user_id=query.from_user.id, page=page)
-    await query.message.edit_text("Choose channel to edit", reply_markup=keyboard.as_markup())
+    await query.message.edit_text("👉Choose channel to edit", reply_markup=keyboard.as_markup())

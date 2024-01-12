@@ -5,5 +5,9 @@
   "delete, remove": "➖",
   "edit, change": "✏\uFE0F",
   "settings, options": "⚙️",
-  "list, all": "\uD83D\uDCCB"
+  "list, all": "\uD83D\uDCCB",
+  "menu": "☰",
+  "choose": "\uD83D\uDC49",
+  "enter": "⌨\uFE0F",
+  "wait": "⏳"
 }

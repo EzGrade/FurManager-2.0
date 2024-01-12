@@ -1,8 +1,70 @@
 from aiogram.filters.callback_data import CallbackData
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
+class Keyboard:
+
+    def __init__(
+            self,
+            elements_set: list,
+            keyboard: InlineKeyboardBuilder,
+            button_page: CallbackData,
+            button_back: CallbackData
+    ):
+        self.elements_set = elements_set
+        self.keyboard = keyboard
+        self.button_page = button_page
+        self.button_back = button_back
+
+    # noinspection PyCallingNonCallable
+    def get_keyboard(self, user_id: int, page: int) -> InlineKeyboardBuilder:
+        if len(self.elements_set) > 1:
+            if page != 1:
+                self.keyboard.button(text="⬅️Previous",
+                                     callback_data=self.button_page(
+                                         user_id=user_id,
+                                         page=page - 1))
+            else:
+                self.keyboard.button(text="Last Page",
+                                     callback_data=self.button_page(
+                                         user_id=user_id,
+                                         page=len(
+                                             self.elements_set)))
+            if page != len(self.elements_set):
+                self.keyboard.button(text="➡️Next",
+                                     callback_data=self.button_page(
+                                         user_id=user_id,
+                                         page=page + 1))
+            else:
+                self.keyboard.button(text="First Page",
+                                     callback_data=self.button_page(
+                                         user_id=user_id,
+                                         page=1))
+
+        self.keyboard.button(text="🔙Back",
+                             callback_data=self.button_back(user_id=user_id))
+        if len(self.elements_set) == 1:
+            if len(self.elements_set[0][0]) <= 3:
+                self.keyboard.adjust(len(self.elements_set[0][0]), 1)
+            elif len(self.elements_set[0][0]) <= 6:
+                self.keyboard.adjust(3, len(self.elements_set[0][0]) - 3, 1)
+            else:
+                self.keyboard.adjust(3, 3, 1)
+        else:
+            if len(self.elements_set[page - 1][0]) <= 3:
+                self.keyboard.adjust(len(self.elements_set[page - 1][0]), 2, 1)
+            elif len(self.elements_set[page - 1][0]) <= 6:
+                self.keyboard.adjust(3, len(self.elements_set[page - 1][0]) - 3, 2, 1)
+            else:
+                self.keyboard.adjust(3, 3, 2, 1)
+        return self.keyboard
 
 
 class CallbackClasses:
     class EmptyCallback(CallbackData, prefix="empty"):
+        pass
+
+    class QuitCallback(CallbackData, prefix="quit"):
         pass
 
     class AdminCallbacks:
@@ -91,6 +153,10 @@ class CallbackClasses:
             channel_id: int
             delay: int
 
+        class EditChannelActiveCallback(CallbackData, prefix="edit_channel_active"):
+            user_id: int
+            channel_id: int
+
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
             user_id: int
@@ -98,3 +164,23 @@ class CallbackClasses:
     class CommandCallbacks:
         class CancelCallback(CallbackData, prefix="cancel"):
             user_id: int
+
+    class PostCallbacks:
+        class ChooseChannelCallback(CallbackData, prefix="choose_channel"):
+            user_id: int
+            channel_id: int
+            page: int
+
+        class ChannelsMenuCallback(CallbackData, prefix="channels_menu"):
+            user_id: int
+            page: int
+
+        class PostToQueue(CallbackData, prefix="to_queue"):
+            user_id: int
+
+        class PostNow(CallbackData, prefix="post_now"):
+            user_id: int
+
+        class SelectAll(CallbackData, prefix="select_all"):
+            user_id: int
+            page: int

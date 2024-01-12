@@ -37,14 +37,9 @@ async def photo_handler(message: Message, state: FSMContext):
     await Handlers.photo_handler(message, state)
 
 
-@dp.message(StateFilter(CreatePost.waiting_for_author))
-async def author_handler(message: Message, state: FSMContext):
-    await Handlers.author_handler(message, state)
-
-
-@dp.message(StateFilter(CreatePost.waiting_for_tags))
-async def tags_handler(message: Message, state: FSMContext):
-    await Handlers.tags_handler(message, state)
+@dp.message(F.text, StateFilter(CreatePost.waiting_for_text))
+async def finish_handler(message: Message, state: FSMContext):
+    await Handlers.finish_handler(message, state)
 
 
 @dp.message(StateFilter(EditChannels.waiting_for_channel_name))
@@ -185,6 +180,47 @@ async def edit_channel_delay_handler(query: CallbackQuery):
 @dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue.filter())
 async def edit_channel_delay_value_handler(query: CallbackQuery):
     await Handlers.edit_channel_delay_value_handler(query)
+
+
+@dp.callback_query(CallbackClasses.QuitCallback.filter())
+async def quit_callback_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.quit_callback_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.PostCallbacks.ChooseChannelCallback.filter())
+async def choose_channel_callback_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.change_list_of_channels(query, state)
+
+
+@dp.callback_query(CallbackClasses.PostCallbacks.ChannelsMenuCallback.filter())
+async def channels_menu_callback_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.channels_menu_callback_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.PostCallbacks.PostToQueue.filter())
+async def post_to_queue_callback_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.post_to_queue_callback_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.PostCallbacks.PostNow.filter())
+async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.post_now_callback_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.PostCallbacks.SelectAll.filter())
+async def select_all_callback_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.select_all_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditChannelActiveCallback.filter())
+async def edit_channel_active_state_handler(query: CallbackQuery):
+    await Handlers.edit_channel_active_sate(query)
+
+
+@dp.callback_query(CallbackClasses.EmptyCallback.filter())
+async def empty_callback_handler(query: CallbackQuery):
+    await query.answer()
+
 
 if __name__ == '__main__':
     asyncio.run(dp.start_polling(bot))

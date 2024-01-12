@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from ChannelModel.models import ChannelModel
 from ChannelModel.serializers import ChannelSerializer
+from PostsModel.models import PostsModel
 from PostsModel.serializers import PostSerializer
 from UserModel.models import UserModel
 from UserModel.serializers import UserSerializer
@@ -20,8 +21,15 @@ class Post:
         serializer = PostSerializer(data=post)
         if serializer.is_valid():
             serializer.save()
-            return True
+            return serializer.instance
         return False
+
+    @staticmethod
+    @sync_to_async
+    def set_channels(post_id: int, channels: typing.List[int]) -> bool:
+        post = PostSerializer(PostsModel.objects.get(pk=post_id))
+        post.instance.channels.set(channels)
+        return True
 
 
 class User:
@@ -92,7 +100,7 @@ class Channel:
         channel_obj = ChannelModel.objects.get(channel_id=channel_id)
         serializer = ChannelSerializer(channel_obj, data=channel_data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.update(channel_obj, channel_data)
             return True
         print(serializer.errors)
         return False
@@ -196,12 +204,29 @@ class Channel:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         return channel.channel_delay
 
+    @staticmethod
+    @sync_to_async
+    def filter_activated(channels_id: typing.List[int]) -> typing.List[ChannelModel]:
+        channels = ChannelModel.objects.filter(channel_id__in=channels_id)
+        result = [i.channel_id for i in channels if i.active]
+        return result
+
 
 class Text:
     @staticmethod
     async def get_settings_text(user_id: int) -> str:
         user_obj = await User.get_user(user_id)
         text = f'⚙️ Settings Menu\nBots number: {len(user_obj.channel_id)}'
+        return text
+
+    @staticmethod
+    async def get_channel_settings_text(channel_id: int) -> str:
+        channel_obj = await Channel.get_channel(channel_id)
+        text = (f'⚙️ Channel Settings Menu\n'
+                f'⌨️Name: {channel_obj.channel_name}\n'
+                f'🆔ID: {channel_id}\n'
+                f'⏳Delay: {channel_obj.channel_delay}\n'
+                f'Active: {"✅" + str(channel_obj.active) if channel_obj.active else "❌" + str(channel_obj.active)}\n')
         return text
 
     @staticmethod

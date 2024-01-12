@@ -11,6 +11,7 @@ class ChannelSerializer(serializers.Serializer):
     channel_holder = serializers.PrimaryKeyRelatedField(required=False, queryset=UserModel.objects.all())
     request_link = serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
     channel_delay = serializers.IntegerField(required=False, default=15)
+    active = serializers.BooleanField(required=False, default=False)
 
     def create(self, validated_data):
         if ChannelModel.objects.filter(channel_id=validated_data["channel_id"]).first():
@@ -24,5 +25,6 @@ class ChannelSerializer(serializers.Serializer):
         instance.channel_holder = validated_data.get('channel_holder', instance.channel_holder)
         instance.request_link = validated_data.get('request_link', instance.request_link)
         instance.channel_delay = validated_data.get('channel_delay', instance.channel_delay)
+        instance.active = validated_data.get('active', instance.active)
         instance.save()
         return instance
