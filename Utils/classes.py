@@ -157,6 +157,10 @@ class CallbackClasses:
             user_id: int
             channel_id: int
 
+        class EditDelayStartPoint(CallbackData, prefix="edit_delay_start_point"):
+            user_id: int
+            channel_id: int
+
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
             user_id: int
@@ -182,5 +186,10 @@ class CallbackClasses:
             user_id: int
 
         class SelectAll(CallbackData, prefix="select_all"):
+            user_id: int
+            page: int
+
+    class MyPosts:
+        class MyPostsMenu(CallbackData, prefix="my_posts_menu"):
             user_id: int
             page: int

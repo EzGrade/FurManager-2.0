@@ -1,3 +1,4 @@
+import datetime
 import secrets
 import typing
 
@@ -30,6 +31,16 @@ class Post:
         post = PostSerializer(PostsModel.objects.get(pk=post_id))
         post.instance.channels.set(channels)
         return True
+
+    @staticmethod
+    @sync_to_async
+    def get_posts_by_user(user_id: int) -> PostsModel:
+        user_obj = UserModel.objects.get(user_id=user_id)
+        result = []
+        for channel in user_obj.channel_id:
+            posts = PostsModel.objects.filter(channels__channel_id__contains=channel)
+            result += [{"photo": i.photo, "caption": i.caption, "channels": i.channels} for i in posts]
+        return result
 
 
 class User:
@@ -222,10 +233,29 @@ class Text:
     @staticmethod
     async def get_channel_settings_text(channel_id: int) -> str:
         channel_obj = await Channel.get_channel(channel_id)
+        admins = await Channel.get_admins_by_channel(channel_id)
+        admins_text = []
+        for admin in admins:
+            admins_text += [f"      {admin['name']} - {admin['id']}"]
+        admins_text = "\n".join(admins_text)
+        date_format = "%Y-%m-%d %H:%M"
+        date = channel_obj.delay_point.strftime(date_format)
+        last_post = channel_obj.last_post.strftime(date_format) if channel_obj.last_post else ""
+        if channel_obj.last_post:
+            next_post = channel_obj.last_post + datetime.timedelta(
+                minutes=channel_obj.channel_delay) if channel_obj.last_post else ""
+        else:
+            next_post = channel_obj.delay_point + datetime.timedelta(
+                minutes=channel_obj.channel_delay) if channel_obj.delay_point else ""
+        next_post = next_post.strftime(date_format) if next_post else ""
         text = (f'⚙️ Channel Settings Menu\n'
                 f'⌨️Name: {channel_obj.channel_name}\n'
                 f'🆔ID: {channel_id}\n'
                 f'⏳Delay: {channel_obj.channel_delay}\n'
+                f'🏁Delay start point: {date}\n'
+                f'📅Last post: {last_post}\n'
+                f'📅Next post: {next_post}\n'
+                f'👥Admins:\n{admins_text}\n'
                 f'Active: {"✅" + str(channel_obj.active) if channel_obj.active else "❌" + str(channel_obj.active)}\n')
         return text
 

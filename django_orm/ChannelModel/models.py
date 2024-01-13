@@ -12,4 +12,6 @@ class ChannelModel(models.Model):
     channel_holder = models.ForeignKey(UserModel, on_delete=models.CASCADE, db_index=True)
     request_link = models.CharField(max_length=100, blank=True, null=True)
     channel_delay = models.IntegerField(default=15)
+    delay_point = models.DateTimeField(blank=True, null=True, editable=True)
+    last_post = models.DateTimeField(blank=True, null=True, editable=True)
     active = models.BooleanField(default=True)

@@ -58,6 +58,7 @@ async def admin_handle_entered_code(message: Message, state: FSMContext):
                                                                        channel_id=channel.channel_id).as_markup())
     else:
         await message.answer(text="❌Channel not found")
+    await state.clear()
 
 
 async def admin_accept_request_handler(query: CallbackQuery):

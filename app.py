@@ -217,6 +217,11 @@ async def edit_channel_active_state_handler(query: CallbackQuery):
     await Handlers.edit_channel_active_sate(query)
 
 
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditDelayStartPoint.filter())
+async def edit_delay_start_point_handler(query: CallbackQuery):
+    await Handlers.edit_delay_start_point_handler(query)
+
+
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())
 async def empty_callback_handler(query: CallbackQuery):
     await query.answer()

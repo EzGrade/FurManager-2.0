@@ -1,3 +1,5 @@
+from datetime import datetime, UTC
+
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
@@ -46,11 +48,13 @@ async def channel_handler(message: Message, state: FSMContext):
                 "channel_id": user_obj.channel_id + [chat.id]
             }
             user_update_result = await User.update_user(user_id=message.from_user.id, user_data=user_data)
+            time_now = datetime.now(UTC)
             data = {
                 "channel_id": chat.id,
                 "channel_name": chat.username,
                 "channel_holder": user_obj.pk,
-                "channel_admins": [message.from_user.id]
+                "channel_admins": [message.from_user.id],
+                "delay_point": time_now,
             }
             result = await Channel.create_channel(data)
             channels_text = await Text.get_add_channel_text(message.from_user.id)

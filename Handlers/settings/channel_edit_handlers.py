@@ -1,3 +1,5 @@
+from datetime import datetime, UTC
+
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery
 
@@ -74,3 +76,26 @@ async def edit_channel_active_sate(query: CallbackQuery):
         except TelegramBadRequest:
             await query.answer()
             return
+
+
+async def edit_delay_start_point_handler(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    date = datetime.now(UTC)
+    data = {
+        "delay_point": date,
+        "last_post": None
+    }
+    result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
+    keyboard = await EditSingleChannelMenu.get_main_menu(user_id, channel_id)
+    text = await Text.get_channel_settings_text(channel_id=channel_id)
+    try:
+        if result:
+            await query.message.edit_text(text=f"{text}", reply_markup=keyboard.as_markup())
+            return
+        else:
+            await query.message.edit_text(text=f"❌Error\n{text}", reply_markup=keyboard.as_markup())
+            return
+    except TelegramBadRequest:
+        await query.answer()
+        return

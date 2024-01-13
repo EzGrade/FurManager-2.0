@@ -108,13 +108,25 @@ class EditSingleChannelMenu:
             active_text = "✅Enable"
         keyboard.button(text=active_text,
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelActiveCallback(
-                            user_id=user_id, channel_id=channel_id))
-        keyboard.button(text="✏️Edit delay",
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
+        keyboard.button(text="✏️Edit Delay",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayCallback(
-                            user_id=user_id, channel_id=channel_id))
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
+        keyboard.button(text="🔄Reset Delay",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditDelayStartPoint(
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
         keyboard.button(text="🔙Back",
-                        callback_data=CallbackClasses.ChannelCallbacks.EditChannelPageCallback(user_id=user_id, page=1))
-        keyboard.adjust(2, 1)
+                        callback_data=CallbackClasses.ChannelCallbacks.EditChannelPageCallback(
+                            user_id=user_id,
+                            page=1
+                        ))
+        keyboard.adjust(1, 2, 1)
         return keyboard
 
     @staticmethod
@@ -259,6 +271,6 @@ class AdminMenu:
             elements_set=admins_set,
             keyboard=keyboard,
             button_page=CallbackClasses.AdminCallbacks.AdminRemoveAdminPage,
-            button_back=CallbackClasses.AdminCallbacks.ChannelRemoveAdmin
+            button_back=CallbackClasses.SettingsCallbacks.SettingsMenuCallback
         )
         return keyboard_adjuster.get_keyboard(user_id=user_id, page=page)
