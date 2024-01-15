@@ -1,9 +1,10 @@
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
-
-from Utils.forms import CreatePost
 from Handlers.my_post_handlers import my_posts_main
+from Markup.settings_markup import SettingsMenu
+from Utils import functions
+from Utils.forms import CreatePost
 
 
 async def handle_markup(message: Message, state: FSMContext):
@@ -12,3 +13,7 @@ async def handle_markup(message: Message, state: FSMContext):
         await state.set_state(CreatePost.waiting_for_photo)
     elif message.text == "📋My posts":
         await my_posts_main(message)
+    elif message.text == "⚙️Settings":
+        settings_text = await functions.Text.get_settings_text(message.from_user.id)
+        await message.answer(settings_text,
+                             reply_markup=SettingsMenu.get_settings_menu(message.from_user.id).as_markup())

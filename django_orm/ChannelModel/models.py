@@ -14,4 +14,5 @@ class ChannelModel(models.Model):
     channel_delay = models.IntegerField(default=15)
     delay_point = models.DateTimeField(blank=True, null=True, editable=True)
     last_post = models.DateTimeField(blank=True, null=True, editable=True)
+    caption_template = models.CharField(max_length=200, blank=True, null=True)
     active = models.BooleanField(default=True)

@@ -222,6 +222,51 @@ async def edit_delay_start_point_handler(query: CallbackQuery):
     await Handlers.edit_delay_start_point_handler(query)
 
 
+@dp.callback_query(CallbackClasses.MyPosts.MyPostsMenu.filter())
+async def my_posts_menu_handler(query: CallbackQuery):
+    await Handlers.my_posts_main(query)
+
+
+@dp.callback_query(CallbackClasses.MyPosts.DeletePost.filter())
+async def delete_post_handler(query: CallbackQuery):
+    await Handlers.delete_post_handler(query)
+
+
+@dp.callback_query(CallbackClasses.MyPosts.PostNow.filter())
+async def post_now_handler(query: CallbackQuery):
+    await Handlers.post_now_handler(query)
+
+
+@dp.callback_query(CallbackClasses.MyPosts.EditChannels.filter())
+async def edit_channels_handler(query: CallbackQuery):
+    await Handlers.edit_channels_handler(query)
+
+
+@dp.callback_query(CallbackClasses.MyPosts.AddChannelToPost.filter())
+async def update_post_channels_handler(query: CallbackQuery):
+    await Handlers.add_channel_to_post(query)
+
+
+@dp.callback_query(CallbackClasses.MyPosts.RemoveChannelFromPost.filter())
+async def update_post_channels_handler(query: CallbackQuery):
+    await Handlers.remove_channel_from_post(query)
+
+
+@dp.callback_query(CallbackClasses.MyPosts.BackToMain.filter())
+async def my_posts_back_to_main_handler(query: CallbackQuery):
+    await Handlers.my_posts_main_back(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditDelayMenu.filter())
+async def edit_delay_menu_handler(query: CallbackQuery):
+    await Handlers.edit_delay_menu_handler(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.SetDelay00.filter())
+async def set_delay_00_handler(query: CallbackQuery):
+    await Handlers.set_0_start_point(query)
+
+
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())
 async def empty_callback_handler(query: CallbackQuery):
     await query.answer()

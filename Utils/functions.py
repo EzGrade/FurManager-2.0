@@ -39,8 +39,38 @@ class Post:
         result = []
         for channel in user_obj.channel_id:
             posts = PostsModel.objects.filter(channels__channel_id__contains=channel)
-            result += [{"photo": i.photo, "caption": i.caption, "channels": i.channels} for i in posts]
+            for post in posts:
+                post_json = {"pk": post.pk, "photo": post.photo, "caption": post.caption, "channels": post.channels}
+                if post_json not in result:
+                    result.append(post_json)
         return result
+
+    @staticmethod
+    @sync_to_async
+    def delete_post(post_id: int) -> bool:
+        try:
+            post = PostsModel.objects.get(pk=post_id)
+            post.delete()
+            return True
+        except PostsModel.DoesNotExist:
+            return False
+
+    @staticmethod
+    @sync_to_async
+    def get_post(post_id: int) -> PostsModel:
+        post = PostsModel.objects.get(pk=post_id)
+        channels = [{"name": i.channel_name, "id": i.channel_id} for i in post.channels.all()]
+        return {"pk": post.pk, "photo": post.photo, "caption": post.caption, "channels": channels}
+
+    @staticmethod
+    @sync_to_async
+    def update_post(post_id: int, post_data: typing.Dict) -> bool:
+        post_obj = PostsModel.objects.get(pk=post_id)
+        serializer = PostSerializer(post_obj, data=post_data)
+        if serializer.is_valid():
+            serializer.update(post_obj, post_data)
+            return True
+        return False
 
 
 class User:
@@ -181,8 +211,9 @@ class Channel:
     @staticmethod
     @sync_to_async
     def get_channels_by_admin(admin_id: int) -> typing.List[ChannelModel]:
+        channels = ChannelModel.objects.filter(channel_admins__contains=[admin_id])
         channels = [{"name": i.channel_name, "id": i.channel_id} for i in
-                    ChannelModel.objects.filter(channel_admins__contains=[admin_id])]
+                    channels]
         return channels
 
     @staticmethod
@@ -222,6 +253,15 @@ class Channel:
         result = [i.channel_id for i in channels if i.active]
         return result
 
+    @staticmethod
+    @sync_to_async
+    def get_channels_by_user_id(user_id: int) -> typing.List[ChannelModel]:
+        user = UserModel.objects.get(user_id=user_id)
+        channels_admin = ChannelModel.objects.filter(channel_admins__contains=[user_id])
+        channels_holder = ChannelModel.objects.filter(channel_holder=user)
+        channels = list(set(channels_admin) | set(channels_holder))
+        return channels
+
 
 class Text:
     @staticmethod
@@ -235,8 +275,8 @@ class Text:
         channel_obj = await Channel.get_channel(channel_id)
         admins = await Channel.get_admins_by_channel(channel_id)
         admins_text = []
-        for admin in admins:
-            admins_text += [f"      {admin['name']} - {admin['id']}"]
+        for index, admin in enumerate(admins):
+            admins_text += [f"      {index + 1}. {admin['name']} - {admin['id']}"]
         admins_text = "\n".join(admins_text)
         date_format = "%Y-%m-%d %H:%M"
         date = channel_obj.delay_point.strftime(date_format)
@@ -248,15 +288,39 @@ class Text:
             next_post = channel_obj.delay_point + datetime.timedelta(
                 minutes=channel_obj.channel_delay) if channel_obj.delay_point else ""
         next_post = next_post.strftime(date_format) if next_post else ""
-        text = (f'⚙️ Channel Settings Menu\n'
+        text = (f'⚙️ Channel Settings Menu\n\n'
                 f'⌨️Name: {channel_obj.channel_name}\n'
-                f'🆔ID: {channel_id}\n'
-                f'⏳Delay: {channel_obj.channel_delay}\n'
-                f'🏁Delay start point: {date}\n'
-                f'📅Last post: {last_post}\n'
-                f'📅Next post: {next_post}\n'
-                f'👥Admins:\n{admins_text}\n'
+                f'🆔ID: {channel_id}\n\n'
+                f'⏳Delay Options\n'
+                f'  ⏳Delay: {channel_obj.channel_delay}\n'
+                f'  🏁Delay start point: {date}\n\n'
+                f'ℹ️Post Info\n'
+                f'  📅Last post: {last_post}\n'
+                f'  📅Next post: {next_post}\n\n'
+                f'👥Admins:\n{admins_text}\n\n'
                 f'Active: {"✅" + str(channel_obj.active) if channel_obj.active else "❌" + str(channel_obj.active)}\n')
+        return text
+
+    @staticmethod
+    async def get_delay_text(channel_id: int) -> str:
+        channel_obj = await Channel.get_channel(channel_id)
+        date_format = "%Y-%m-%d %H:%M"
+        date = channel_obj.delay_point.strftime(date_format)
+        last_post = channel_obj.last_post.strftime(date_format) if channel_obj.last_post else ""
+        if channel_obj.last_post:
+            next_post = channel_obj.last_post + datetime.timedelta(
+                minutes=channel_obj.channel_delay) if channel_obj.last_post else ""
+        else:
+            next_post = channel_obj.delay_point + datetime.timedelta(
+                minutes=channel_obj.channel_delay) if channel_obj.delay_point else ""
+        next_post = next_post.strftime(date_format) if next_post else ""
+        text = (f'⚙️ Delay Menu\n\n'
+                f'⏳Delay Options\n'
+                f'  ⏳Delay: {channel_obj.channel_delay}\n'
+                f'  🏁Delay start point: {date}\n\n'
+                f'ℹ️Post Info\n'
+                f'  📅Last post: {last_post}\n'
+                f'  📅Next post: {next_post}\n')
         return text
 
     @staticmethod

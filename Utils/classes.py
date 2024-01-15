@@ -20,7 +20,7 @@ class Keyboard:
     def get_keyboard(self, user_id: int, page: int) -> InlineKeyboardBuilder:
         if len(self.elements_set) > 1:
             if page != 1:
-                self.keyboard.button(text="⬅️Previous",
+                self.keyboard.button(text="⬅️",
                                      callback_data=self.button_page(
                                          user_id=user_id,
                                          page=page - 1))
@@ -31,7 +31,7 @@ class Keyboard:
                                          page=len(
                                              self.elements_set)))
             if page != len(self.elements_set):
-                self.keyboard.button(text="➡️Next",
+                self.keyboard.button(text="➡️",
                                      callback_data=self.button_page(
                                          user_id=user_id,
                                          page=page + 1))
@@ -40,9 +40,9 @@ class Keyboard:
                                      callback_data=self.button_page(
                                          user_id=user_id,
                                          page=1))
-
-        self.keyboard.button(text="🔙Back",
-                             callback_data=self.button_back(user_id=user_id))
+        if self.button_back is not None:
+            self.keyboard.button(text="🔙Back",
+                                 callback_data=self.button_back(user_id=user_id))
         if len(self.elements_set) == 1:
             if len(self.elements_set[0][0]) <= 3:
                 self.keyboard.adjust(len(self.elements_set[0][0]), 1)
@@ -161,6 +161,14 @@ class CallbackClasses:
             user_id: int
             channel_id: int
 
+        class EditDelayMenu(CallbackData, prefix="edit_delay_menu"):
+            user_id: int
+            channel_id: int
+
+        class SetDelay00(CallbackData, prefix="set_delay_00"):
+            user_id: int
+            channel_id: int
+
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
             user_id: int
@@ -193,3 +201,33 @@ class CallbackClasses:
         class MyPostsMenu(CallbackData, prefix="my_posts_menu"):
             user_id: int
             page: int
+
+        class DeletePost(CallbackData, prefix="delete_post"):
+            user_id: int
+            page: int
+            post_id: int
+
+        class PostNow(CallbackData, prefix="post_now"):
+            user_id: int
+            page: int
+            post_id: int
+
+        class EditChannels(CallbackData, prefix="edit_channels"):
+            user_id: int
+            page: int
+            post_id: int
+
+        class AddChannelToPost(CallbackData, prefix="update_post_channels"):
+            user_id: int
+            page: int
+            post_id: int
+            channel_id: int
+
+        class RemoveChannelFromPost(CallbackData, prefix="remove_channel_from_post"):
+            user_id: int
+            page: int
+            post_id: int
+            channel_id: int
+
+        class BackToMain(CallbackData, prefix="back_to_main"):
+            user_id: int

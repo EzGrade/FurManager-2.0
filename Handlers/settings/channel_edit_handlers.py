@@ -87,14 +87,47 @@ async def edit_delay_start_point_handler(query: CallbackQuery):
         "last_post": None
     }
     result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
-    keyboard = await EditSingleChannelMenu.get_main_menu(user_id, channel_id)
-    text = await Text.get_channel_settings_text(channel_id=channel_id)
+    keyboard = await EditSingleChannelMenu.get_delay_main_menu(user_id, channel_id)
+    text = await Text.get_delay_text(channel_id=channel_id)
     try:
         if result:
-            await query.message.edit_text(text=f"{text}", reply_markup=keyboard.as_markup())
+            await query.message.edit_text(text=f"{text}\n✅Success", reply_markup=keyboard.as_markup())
             return
         else:
-            await query.message.edit_text(text=f"❌Error\n{text}", reply_markup=keyboard.as_markup())
+            await query.message.edit_text(text=f"{text}\n❌Error", reply_markup=keyboard.as_markup())
+            return
+    except TelegramBadRequest:
+        await query.answer()
+        return
+
+
+async def edit_delay_menu_handler(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    keyboard = await EditSingleChannelMenu.get_delay_main_menu(user_id, channel_id)
+    text = await Text.get_delay_text(channel_id=channel_id)
+    await query.message.edit_text(text=f"{text}", reply_markup=keyboard.as_markup())
+    return
+
+
+async def set_0_start_point(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    current_time = datetime.now(UTC)
+    current_00 = datetime(year=current_time.year, month=current_time.month, day=current_time.day - 1, hour=18, minute=0)
+    data = {
+        "delay_point": current_00,
+        "last_post": None
+    }
+    result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
+    keyboard = await EditSingleChannelMenu.get_delay_main_menu(user_id, channel_id)
+    text = await Text.get_delay_text(channel_id=channel_id)
+    try:
+        if result:
+            await query.message.edit_text(text=f"{text}\n✅Success", reply_markup=keyboard.as_markup())
+            return
+        else:
+            await query.message.edit_text(text=f"{text}\n❌Error", reply_markup=keyboard.as_markup())
             return
     except TelegramBadRequest:
         await query.answer()

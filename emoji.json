@@ -9,5 +9,8 @@
   "menu": "☰",
   "choose": "\uD83D\uDC49",
   "enter": "⌨\uFE0F",
-  "wait": "⏳"
+  "wait": "⏳",
+  "back": "⬅️",
+  "next": "➡️",
+  "info": "ℹ️"
 }

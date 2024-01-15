@@ -45,7 +45,7 @@ class PostMenu:
 
         if len(channels_set) > 1:
             if page != 1:
-                keyboard.button(text="⬅️Previous",
+                keyboard.button(text="⬅️",
                                 callback_data=CallbackClasses.PostCallbacks.ChannelsMenuCallback(
                                     user_id=user_id,
                                     page=page - 1))
@@ -56,7 +56,7 @@ class PostMenu:
                                     page=len(
                                         channels_set)))
             if page != len(channels_set):
-                keyboard.button(text="➡️Next",
+                keyboard.button(text="➡️",
                                 callback_data=CallbackClasses.PostCallbacks.ChannelsMenuCallback(
                                     user_id=user_id,
                                     page=page + 1))
