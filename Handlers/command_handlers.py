@@ -1,4 +1,3 @@
-from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from Markup.main_markup import get_main_menu

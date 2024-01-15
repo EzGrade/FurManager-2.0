@@ -1,3 +1,29 @@
+import os
+
+import django
+from django.conf import settings
+
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_orm.django_orm.settings')
+    settings.configure(
+        DATABASES={
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": "furmanager",
+                "USER": "postgres",
+                "PASSWORD": "GradeTop1!",
+                "HOST": "localhost",
+                "PORT": "5432",
+            }
+        },
+        INSTALLED_APPS=[
+            'rest_framework',
+            'django_orm.postsmodel',
+        ]
+    )
+    django.setup()
+
+
 import asyncio
 
 from aiogram import F
@@ -287,5 +313,9 @@ async def empty_callback_handler(query: CallbackQuery):
     await query.answer()
 
 
-if __name__ == '__main__':
+def run():
     asyncio.run(dp.start_polling(bot))
+
+
+if __name__ == '__main__':
+    run()
