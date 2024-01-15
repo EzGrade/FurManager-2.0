@@ -169,6 +169,14 @@ class CallbackClasses:
             user_id: int
             channel_id: int
 
+        class EditTemplate(CallbackData, prefix="edit_template"):
+            user_id: int
+            channel_id: int
+
+        class EditTemplateValue(CallbackData, prefix="edit_template_value"):
+            user_id: int
+            channel_id: int
+
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
             user_id: int

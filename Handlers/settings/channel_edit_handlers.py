@@ -1,9 +1,11 @@
 from datetime import datetime, UTC
 
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery, Message
 
 from Markup.settings_markup import EditSingleChannelMenu
+from Utils import forms
 from Utils.functions import Channel, Text
 
 
@@ -132,3 +134,46 @@ async def set_0_start_point(query: CallbackQuery):
     except TelegramBadRequest:
         await query.answer()
         return
+
+
+async def edit_template_handler(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    keyboard = await EditSingleChannelMenu.get_template_menu(user_id, channel_id)
+    text = await Text.template_text(channel_id=channel_id)
+    await query.message.edit_text(text=f"{text}", reply_markup=keyboard.as_markup(), parse_mode="Markdown")
+    return
+
+
+async def ask_for_template_text(query: CallbackQuery, state: FSMContext):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    await state.update_data(user_id=user_id)
+    await state.update_data(channel_id=channel_id)
+    await query.message.edit_text(text="✏️Send me your template text", reply_markup=None)
+    await state.set_state(forms.EditChannels.waiting_for_template)
+
+
+async def process_template_text(message: Message, state: FSMContext):
+    state_data = await state.get_data()
+    user_id = state_data.get("user_id")
+    channel_id = state_data.get("channel_id")
+    text = message.text
+    warnings_text = Text.process_template(text=text)
+    if warnings_text:
+        warnings_text = "\n".join([f"❗%{warning}%" for warning in warnings_text])
+        warnings_text = f"\n⚠️Warnings\n{warnings_text}\n\nℹ️ Tags from warnings wont affect your caption"
+    data = {
+        "caption_template": text
+    }
+    result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
+    keyboard = await EditSingleChannelMenu.get_template_menu(user_id, channel_id)
+    text = await Text.template_text(channel_id=channel_id)
+    if warnings_text:
+        text = f"{text}\n{warnings_text}"
+    if result:
+        await message.answer(text=f"{text}\n\n✅Success", reply_markup=keyboard.as_markup(), parse_mode="Markdown")
+    else:
+        await message.answer(text=f"{text}\n\n❌Error", reply_markup=keyboard.as_markup(), parse_mode="Markdown")
+    await state.clear()
+    return

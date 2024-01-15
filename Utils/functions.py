@@ -72,6 +72,11 @@ class Post:
             return True
         return False
 
+    @staticmethod
+    @sync_to_async
+    def get_post_obj(post_id: int) -> PostsModel:
+        return PostsModel.objects.get(pk=post_id)
+
 
 class User:
 
@@ -342,6 +347,56 @@ class Text:
         else:
             text = "You don't have any channels yet"
         return text
+
+    @staticmethod
+    async def template_text(channel_id: int) -> str:
+        channel_obj = await Channel.get_channel(channel_id)
+        current_template = channel_obj.caption_template
+        if current_template is None:
+            current_template = "No template"
+
+        help_text = ("You can use\n"
+                     "  ```%text%```post caption\n"
+                     "  ```%channel name%```channel name\n"
+                     "  ```%channel id%```channel id\n"
+                     "  ```%channel link%```channel link\n\n")
+
+        text = f"📋{help_text}✅Current template\n{current_template}"
+        return text
+
+    @staticmethod
+    def process_template(text: str) -> list[str] | None:
+        import re
+        pattern = r'%([^%]+)%'
+        matches = re.findall(pattern, text)
+        warning = []
+        for match in matches:
+            if match not in ["text", "channel name", "channel id", "channel link"]:
+                warning.append(match)
+        if warning:
+            return warning
+
+    @staticmethod
+    @sync_to_async
+    def format_caption(caption_str: str, channel_id: int):
+        channel = ChannelModel.objects.get(channel_id=channel_id)
+        template = channel.caption_template
+        if template is None:
+            return caption_str
+        if "%text%" in template:
+            template = template.replace("%text%", caption_str)
+        if "%channel name%" in template:
+            template = template.replace("%channel name%", channel.channel_name)
+        if "%channel id%" in template:
+            template = template.replace("%channel id%", channel.channel_id)
+        if "%channel link%" in template:
+            if channel.channel_name:
+                template = template.replace("%channel link%",
+                                            f"[{channel.channel_name}](https://t.me/{channel.channel_name})")
+            else:
+                template = template.replace("%channel link%", f"[Channel Link](https://t.me/{channel.channel_id})")
+
+        return template
 
     @staticmethod
     def is_text(text: str) -> bool:

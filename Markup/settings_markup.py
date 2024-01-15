@@ -116,6 +116,11 @@ class EditSingleChannelMenu:
                             user_id=user_id,
                             channel_id=channel_id
                         ))
+        keyboard.button(text="✏️Edit Caption Template",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditTemplate(
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
         keyboard.button(text="🔙Back",
                         callback_data=CallbackClasses.ChannelCallbacks.EditChannelPageCallback(
                             user_id=user_id,
@@ -184,6 +189,21 @@ class EditSingleChannelMenu:
             channel_id=channel_id
         ))
         keyboard.adjust(2, 2, 1)
+        return keyboard
+
+    @staticmethod
+    async def get_template_menu(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
+        keyboard = InlineKeyboardBuilder()
+        keyboard.button(text="✏️Edit template",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditTemplateValue(
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
+        keyboard.button(text="🔙Back", callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
+            user_id=user_id,
+            channel_id=channel_id
+        ))
+        keyboard.adjust(1, 2, 1)
         return keyboard
 
 

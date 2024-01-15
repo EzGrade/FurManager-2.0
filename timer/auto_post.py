@@ -37,9 +37,11 @@ django.setup()
 from ChannelModel.models import ChannelModel
 from PostsModel.models import PostsModel
 
-import time, asyncio
+import time
+import asyncio
 
 from loader import bot
+from Utils.functions import Text
 
 
 class AutoPost:
@@ -55,7 +57,7 @@ class AutoPost:
         return [channel.channel_id for channel in self.channels]
 
     async def __SendPost(self, channel_id: int, image: str, text: str):
-        await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text)
+        await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text, parse_mode="MarkdownV2")
         await self.__UpdateLastPost(channel_id)
 
     @sync_to_async
@@ -116,8 +118,8 @@ class AutoPost:
 
             post = await self.__GetPost(channel)
             if post is not None:
-
-                task = asyncio.create_task(self.__SendPost(channel, post.photo, post.caption))
+                caption = await Text.format_caption(post.caption, channel)
+                task = asyncio.create_task(self.__SendPost(channel, post.photo, caption))
                 tasks.append(task)
                 await self.__RemoveChannel(channel, post)
 
@@ -127,7 +129,7 @@ class AutoPost:
         while True:
             channels = self.__GetChannels()
             asyncio.get_event_loop().run_until_complete(self.__Run(channels=channels))
-            time.sleep(15)
+            time.sleep(5)
 
 
 if __name__ == '__main__':

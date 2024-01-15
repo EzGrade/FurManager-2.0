@@ -2,7 +2,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, InputMediaPhoto
 
 from Markup.my_posts_markup import MyPosts
-from Utils.functions import Post, Channel
+from Utils.functions import Post, Channel, Text
 from loader import bot
 
 
@@ -73,11 +73,13 @@ async def post_now_handler(query: CallbackQuery):
     query_data = query.data.split(":")
     post_id = int(query_data[3])
     post = await Post.get_post(post_id)
+    post_obj = await Post.get_post_obj(post_id)
     channels = post["channels"]
     failed = []
     for channel in channels:
         try:
-            await bot.send_photo(chat_id=channel["id"], photo=post["photo"], caption=post["caption"])
+            caption = await Text.format_caption(post["caption"], channel["id"])
+            await bot.send_photo(chat_id=channel["id"], photo=post["photo"], caption=caption)
             await query.message.answer(f"Posted to {channel['name']}")
         except TelegramBadRequest:
             failed.append(channel)

@@ -1,4 +1,10 @@
-import datetime
-from datetime import UTC
+from loader import bot
+import asyncio
 
-print(datetime.datetime.now(UTC))
+
+async def test_markdown(message):
+    await bot.send_message(chat_id=1019900002,
+                           text='[testchannelgrade](https://t.me/testchannelgrade)',
+                           parse_mode="MarkdownV2")
+
+asyncio.run(test_markdown(1))

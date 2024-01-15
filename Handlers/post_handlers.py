@@ -87,20 +87,22 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
         "caption": state_data["caption"] if state_data["caption"] else None,
         "channels": checked_channels_list
     }
-    success = []
     not_success = []
     await query.message.answer(text="⏳Posting...")
     for post_object in json_data["channels"]:
         channel_obj = await functions.Channel.get_channel(post_object)
         try:
-            await bot.send_photo(chat_id=channel_obj.channel_id, photo=json_data["photo"], caption=json_data["caption"])
-            success += [channel_obj.channel_name]
-            await query.message.answer(text=f"✅Successfully posted in {', '.join(success)}")
+            caption = await functions.Text.format_caption(json_data["caption"], channel_obj.channel_id)
+            await bot.send_photo(chat_id=channel_obj.channel_id, photo=json_data["photo"], caption=caption,
+                                 parse_mode="MarkdownV2")
+            await query.message.answer(text=f"✅Successfully posted in {channel_obj.channel_name}")
         except Exception as e:
-            print(e)
             not_success += [channel_obj.channel_name]
-            await query.message.answer(text=f"❌Error posting in {', '.join(not_success)}")
-    await query.answer()
+    if len(not_success) == 0:
+        await query.message.answer(text="✅Successfully posted in all channels")
+    else:
+        await query.message.answer(text=f"❌Error posting in {', '.join(not_success)}")
+        await query.answer()
     await query.message.delete()
     await state.clear()
 

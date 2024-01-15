@@ -9,6 +9,7 @@ class CreatePost(StatesGroup):
 
 class EditChannels(StatesGroup):
     waiting_for_channel_name = State()
+    waiting_for_template = State()
 
 
 class AdminPanel(StatesGroup):

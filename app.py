@@ -52,6 +52,11 @@ async def admin_enter_link_handler(message: Message, state: FSMContext):
     await Handlers.admin_handle_entered_code(message, state)
 
 
+@dp.message(StateFilter(EditChannels.waiting_for_template))
+async def template_handler(message: Message, state: FSMContext):
+    await Handlers.process_template_text(message, state)
+
+
 @dp.message()
 async def handle_markup(message: Message, state: FSMContext):
     await Handlers.handle_markup(message, state)
@@ -265,6 +270,16 @@ async def edit_delay_menu_handler(query: CallbackQuery):
 @dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.SetDelay00.filter())
 async def set_delay_00_handler(query: CallbackQuery):
     await Handlers.set_0_start_point(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditTemplate.filter())
+async def edit_template_handler(query: CallbackQuery):
+    await Handlers.edit_template_handler(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditTemplateValue.filter())
+async def edit_template_value_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.ask_for_template_text(query, state)
 
 
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())
