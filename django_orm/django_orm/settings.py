@@ -78,17 +78,8 @@ WSGI_APPLICATION = 'django_orm.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "furmanager",
-        "USER": "postgres",
-        "PASSWORD": "GradeTop1!",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
+    'default': dj_database_url.parse('postgres://nrwaqqfbzktosn:1c0f6159eb76771f74140e40a642ab2c25a11420de615a47576dae521186fa4d@ec2-34-241-82-91.eu-west-1.compute.amazonaws.com:5432/d6patuiiqjb5bk')
 }
-
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
