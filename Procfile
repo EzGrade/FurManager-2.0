@@ -1,1 +1,1 @@
-web: uvicorn django_orm.asgi:application --host 0.0.0.0 --port 8080 & python app.py & python timer/auto_post.py wait -n
+web: uvicorn django_orm.asgi:application --host 0.0.0.0 --port $PORT
