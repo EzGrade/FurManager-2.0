@@ -293,10 +293,11 @@ async def empty_callback_handler(query: CallbackQuery):
     await query.answer()
 
 
-def run():
+async def run():
+    print("Starting bot...")
     logging.basicConfig(level=logging.DEBUG)
-    asyncio.run(dp.start_polling(bot))
+    await dp.start_polling(bot)
 
 
 if __name__ == '__main__':
-    run()
+    asyncio.run(run())

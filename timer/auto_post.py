@@ -1,16 +1,12 @@
-import setup
+import asyncio
 from datetime import datetime, timezone, UTC
 
 from asgiref.sync import sync_to_async
 
 from ChannelModel.models import ChannelModel
 from PostsModel.models import PostsModel
-
-import time
-import asyncio
-
-from loader import bot
 from Utils.functions import Text
+from loader import bot
 
 
 class AutoPost:
@@ -21,6 +17,7 @@ class AutoPost:
     def __UpdateChannels(self):
         self.channels = ChannelModel.objects.filter(active=True)
 
+    @sync_to_async
     def __GetChannels(self):
         self.__UpdateChannels()
         return [channel.channel_id for channel in self.channels]
@@ -94,15 +91,21 @@ class AutoPost:
 
         await asyncio.gather(*tasks)
 
-    def Start(self):
+    async def Start(self):
+        print("Auto Posting Started...")
         while True:
-            channels = self.__GetChannels()
-            asyncio.get_event_loop().run_until_complete(self.__Run(channels=channels))
-            time.sleep(5)
+            channels = await self.__GetChannels()
+            await self.__Run(channels=channels)
+            await asyncio.sleep(5)
+
+
+def Run():
+    print("Starting Auto Posting...")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    asyncio.run(AutoPost().Start)
 
 
 if __name__ == '__main__':
     print("Starting Auto Posting...")
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    AutoPost().Start()
+    AutoPost().Run()
