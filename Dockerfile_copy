@@ -1,17 +1,13 @@
-FROM PYTHON:3.8
+FROM python:3.11
 
 LABEL authors="abore"
-
-ENTRYPOINT ["top", "-b"]
 
 WORKDIR /
 
 COPY requirements.txt ./
+COPY run.sh ./
+COPY ./ ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 5000
-
-CMD ["python", "app.py"]
-
-CMD ["python", "app.py"]
+CMD ["sh", "/run_static.sh"]

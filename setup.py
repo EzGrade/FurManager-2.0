@@ -1,19 +1,22 @@
-import django.conf
-
-import sys
 import os
+import sys
+
+import django.conf
 
 sys.path.append(os.path.abspath('django_orm'))
 
 django.conf.settings.configure(
     DATABASES={
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "furmanager",
-            "USER": "postgres",
-            "PASSWORD": "GradeTop1!",
-            "HOST": "localhost",
-            "PORT": "5432",
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'defaultdb',
+            'USER': 'doadmin',
+            'PASSWORD': 'AVNS_upLjkxOrOll61wKv5ZO',
+            'HOST': 'furmanagerdb-do-user-15552012-0.c.db.ondigitalocean.com',
+            'PORT': '25060',
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
         }
     },
     INSTALLED_APPS=[

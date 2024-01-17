@@ -1,38 +1,7 @@
-import os
+import setup
 from datetime import datetime, timezone, UTC
 
-import django
 from asgiref.sync import sync_to_async
-from django.conf import settings
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
-
-settings.configure(
-    DATABASES={
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "furmanager",
-            "USER": "postgres",
-            "PASSWORD": "GradeTop1!",
-            "HOST": "localhost",
-            "PORT": "5432",
-        }
-    },
-    INSTALLED_APPS=[
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'rest_framework',
-        'PostsModel.apps.PostsmodelConfig',
-        'UserModel.apps.UsermodelConfig',
-        'ChannelModel.apps.ChannelmodelConfig',
-    ]
-)
-
-django.setup()
 
 from ChannelModel.models import ChannelModel
 from PostsModel.models import PostsModel
@@ -133,6 +102,7 @@ class AutoPost:
 
 
 if __name__ == '__main__':
+    print("Starting Auto Posting...")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     AutoPost().Start()
