@@ -1,1 +1,1 @@
-web: python django_orm/manage.py runserver 0.0.0.0:8080
+web: gunicorn django_orm.wsgi:application --bind 0.0.0.0:8080
