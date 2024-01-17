@@ -1,3 +1,5 @@
+import uvicorn
+
 import setup
 
 import asyncio
@@ -293,7 +295,7 @@ async def empty_callback_handler(query: CallbackQuery):
 
 def run():
     logging.basicConfig(level=logging.DEBUG)
-    asyncio.run(dp.start_polling(bot))
+    uvicorn.run(dp.start_polling(bot), host="0.0.0.0", port=8080)
 
 
 if __name__ == '__main__':
