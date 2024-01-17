@@ -1,1 +1,1 @@
-web: cd django_orm && gunicorn django_orm.wsgi:application --bind 0.0.0.0:8080
+web: cd django_orm && python manage.py runserver 0.0.0.0:8080
