@@ -13,6 +13,8 @@ from Utils.forms import CreatePost, EditChannels, AdminPanel
 from Utils.functions import Text
 from loader import dp, bot
 
+import logging
+
 
 @dp.message(Text.is_text("/start"), StateFilter(None))
 async def start_handler(message: Message):
@@ -290,6 +292,7 @@ async def empty_callback_handler(query: CallbackQuery):
 
 
 def run():
+    logging.basicConfig(level=logging.DEBUG)
     asyncio.run(dp.start_polling(bot))
 
 
