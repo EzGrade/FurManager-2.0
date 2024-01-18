@@ -14,6 +14,7 @@ class ChannelSerializer(serializers.Serializer):
     delay_point = serializers.DateTimeField(required=False, allow_null=True)
     last_post = serializers.DateTimeField(required=False, allow_null=True)
     caption_template = serializers.CharField(required=False, max_length=200, allow_blank=True, allow_null=True)
+    posts_number = serializers.IntegerField(required=False, default=1)
     active = serializers.BooleanField(required=False, default=False)
 
     def create(self, validated_data):
@@ -31,6 +32,7 @@ class ChannelSerializer(serializers.Serializer):
         instance.delay_point = validated_data.get('delay_point', instance.delay_point)
         instance.last_post = validated_data.get('last_post', instance.last_post)
         instance.caption_template = validated_data.get('caption_template', instance.caption_template)
+        instance.posts_number = validated_data.get('posts_number', instance.posts_number)
         instance.active = validated_data.get('active', instance.active)
         instance.save()
         return instance

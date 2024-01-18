@@ -116,7 +116,7 @@ class EditSingleChannelMenu:
                             user_id=user_id,
                             channel_id=channel_id
                         ))
-        keyboard.button(text="✏️Edit Delay",
+        keyboard.button(text="⏳Edit Delay",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditDelayMenu(
                             user_id=user_id,
                             channel_id=channel_id
@@ -131,7 +131,7 @@ class EditSingleChannelMenu:
                             user_id=user_id,
                             page=1
                         ))
-        keyboard.adjust(2, 1)
+        keyboard.adjust(1, 2, 1)
         return keyboard
 
     @staticmethod
@@ -153,12 +153,18 @@ class EditSingleChannelMenu:
                             channel_id=channel_id,
                             posts_number=value + 1
                         ))
+        keyboard.button(text="Set 1",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            posts_number=1
+                        ))
         keyboard.button(text="🔙Back",
                         callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
                             user_id=user_id,
                             channel_id=channel_id
                         ))
-        keyboard.adjust(3, 1)
+        keyboard.adjust(3, 1, 1)
         return keyboard
 
     @staticmethod

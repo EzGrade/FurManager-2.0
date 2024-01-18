@@ -148,7 +148,6 @@ class Channel:
         if serializer.is_valid():
             serializer.update(channel_obj, channel_data)
             return True
-        print(serializer.errors)
         return False
 
     @staticmethod
@@ -300,6 +299,8 @@ class Text:
                 f'  ⏳Delay: {channel_obj.channel_delay}\n'
                 f'  🏁Delay start point: {date}\n\n'
                 f'ℹ️Post Info\n'
+                f'  📋Template: {channel_obj.caption_template}\n'
+                f'  📊Posts number: {channel_obj.posts_number}\n'
                 f'  📅Last post: {last_post}\n'
                 f'  📅Next post: {next_post}\n\n'
                 f'👥Admins:\n{admins_text}\n\n'
@@ -324,8 +325,10 @@ class Text:
                 f'  ⏳Delay: {channel_obj.channel_delay}\n'
                 f'  🏁Delay start point: {date}\n\n'
                 f'ℹ️Post Info\n'
+                f'  📋Template: {channel_obj.caption_template}\n'
+                f'  📊Posts number: {channel_obj.posts_number}\n'
                 f'  📅Last post: {last_post}\n'
-                f'  📅Next post: {next_post}\n')
+                f'  📅Next post: {next_post}\n\n')
         return text
 
     @staticmethod
@@ -402,9 +405,8 @@ class Text:
     @sync_to_async
     def get_posts_number_text(channel_id: int) -> str:
         channel = ChannelModel.objects.get(channel_id=channel_id)
-        text = (f"⚙️Posts number edit menu"
-                f"Change number of posts that will be posted at the same time\n\n"
-                f"📋Current posts number: {channel.posts_number}")
+        text = (f"⚙️Posts number edit menu\n"
+                f"ℹ️Change number of posts that will be posted at the same time")
         return text
 
     @staticmethod
