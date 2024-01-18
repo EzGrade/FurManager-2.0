@@ -17,7 +17,7 @@ async def get_channels_list(query: CallbackQuery):
 
 
 async def wait_for_channel_name(query: CallbackQuery, state: FSMContext):
-    await query.message.edit_text("⌨️Enter channel name or link(It should start with @ or https://t.me/joinchat/)")
+    await query.message.edit_text("⌨️Enter channel name (Invitation link if it's private channel https://t.me//)")
     await state.set_state(forms.EditChannels.waiting_for_channel_name)
 
 
@@ -27,7 +27,7 @@ async def add_bot_as_admin(query: CallbackQuery):
 
 
 async def channel_handler(message: Message, state: FSMContext):
-    if message.text.startswith("https://t.me/joinchat/"):
+    if message.text.startswith("https://t.me/"):
         invite_link = message.text
         chat = await bot.export_chat_invite_link(invite_link)
         channel_id = chat.id
@@ -45,7 +45,7 @@ async def channel_handler(message: Message, state: FSMContext):
                 reply_markup=AddChannelMenu.add_channel_menu(message.from_user.id).as_markup())
         else:
             user_obj = await User.get_user(message.from_user.id)
-            chat = await bot.get_chat(chat_id=channel_username)
+            chat = await bot.get_chat(chat_id=channel_id)
             user_data = {
                 "channel_id": user_obj.channel_id + [chat.id]
             }
