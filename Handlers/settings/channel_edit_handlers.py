@@ -183,7 +183,7 @@ async def edit_posts_number_menu_handler(query: CallbackQuery):
     user_id = int(query.data.split(":")[1])
     channel_id = int(query.data.split(":")[2])
     keyboard = await EditSingleChannelMenu.get_posts_number_menu(user_id, channel_id)
-    text = Text.get_posts_number_text(channel_id=channel_id)
+    text = await Text.get_posts_number_text(channel_id=channel_id)
     await query.message.edit_text(text=f"{text}", reply_markup=keyboard.as_markup())
     return
 
@@ -207,7 +207,7 @@ async def edit_posts_number_value_handler(query: CallbackQuery):
     }
     result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
     keyboard = await EditSingleChannelMenu.get_posts_number_menu(user_id, channel_id)
-    text = Text.get_posts_number_text(channel_id=channel_id)
+    text = await Text.get_posts_number_text(channel_id=channel_id)
     if result:
         await query.message.edit_text(text=f"{text}\n\n✅Success", reply_markup=keyboard.as_markup())
     else:

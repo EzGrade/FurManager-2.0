@@ -399,6 +399,7 @@ class Text:
         return template
 
     @staticmethod
+    @sync_to_async
     def get_posts_number_text(channel_id: int) -> str:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         text = (f"⚙️Posts number edit menu"
