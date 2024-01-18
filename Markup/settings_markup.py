@@ -111,6 +111,11 @@ class EditSingleChannelMenu:
                             user_id=user_id,
                             channel_id=channel_id
                         ))
+        keyboard.button(text="✏️Change Posts Number",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberMenu(
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
         keyboard.button(text="✏️Edit Delay",
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditDelayMenu(
                             user_id=user_id,
@@ -127,6 +132,33 @@ class EditSingleChannelMenu:
                             page=1
                         ))
         keyboard.adjust(2, 1)
+        return keyboard
+
+    @staticmethod
+    async def get_posts_number_menu(user_id: int, channel_id: int) -> InlineKeyboardBuilder:
+        channel = await Channel.get_channel(channel_id)
+        value = channel.posts_number
+        keyboard = InlineKeyboardBuilder()
+        keyboard.button(text="➖1",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            value=value - 1
+                        ))
+        keyboard.button(text=f"Current: {value}",
+                        callback_data=CallbackClasses.EmptyCallback())
+        keyboard.button(text="➕1",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            value=value + 1
+                        ))
+        keyboard.button(text="🔙Back",
+                        callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
+        keyboard.adjust(3, 1)
         return keyboard
 
     @staticmethod

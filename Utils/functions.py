@@ -399,6 +399,14 @@ class Text:
         return template
 
     @staticmethod
+    def get_posts_number_text(channel_id: int) -> str:
+        channel = ChannelModel.objects.get(channel_id=channel_id)
+        text = (f"⚙️Posts number edit menu"
+                f"Change number of posts that will be posted at the same time\n\n"
+                f"📋Current posts number: {channel.posts_number}")
+        return text
+
+    @staticmethod
     def is_text(text: str) -> bool:
         return F.text == text
 

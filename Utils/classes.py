@@ -177,6 +177,15 @@ class CallbackClasses:
             user_id: int
             channel_id: int
 
+        class EditPostsNumberMenu(CallbackData, prefix="edit_posts_number"):
+            user_id: int
+            channel_id: int
+
+        class EditPostsNumberValue(CallbackData, prefix="edit_posts_number_value"):
+            user_id: int
+            channel_id: int
+            posts_number: int
+
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
             user_id: int
