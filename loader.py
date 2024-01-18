@@ -6,7 +6,7 @@ TOKENS = {
     "PROD": "6955659259:AAFrkK1TrJQSSMhLUy1O2xcEU-DUAJlLeJo"
 }
 
-DEV = False
+DEV = True
 
 if DEV:
     TOKEN = TOKENS["DEV"]
