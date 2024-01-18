@@ -97,6 +97,7 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
                                  parse_mode="MarkdownV2")
             await query.message.answer(text=f"✅Successfully posted in {channel_obj.channel_name}")
         except Exception as e:
+            print(e)
             not_success += [channel_obj.channel_name]
     if len(not_success) == 0:
         await query.message.answer(text="✅Successfully posted in all channels")
