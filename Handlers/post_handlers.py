@@ -15,7 +15,7 @@ async def photo_handler(message: Message, state: FSMContext):
 
 async def finish_handler(message: Message, state: FSMContext):
     data = await state.get_data()
-    caption = message.text.replace(".", "\." if message.text != "." else ""
+    caption = message.text.replace(".", "\.") if message.text != "." else ""
     await state.update_data(caption=caption)
     keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
     await message.answer_photo(photo=data["photo"], caption=caption,
