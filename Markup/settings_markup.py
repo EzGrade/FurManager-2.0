@@ -143,7 +143,7 @@ class EditSingleChannelMenu:
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue(
                             user_id=user_id,
                             channel_id=channel_id,
-                            value=value - 1
+                            posts_number=value - 1
                         ))
         keyboard.button(text=f"Current: {value}",
                         callback_data=CallbackClasses.EmptyCallback())
@@ -151,7 +151,7 @@ class EditSingleChannelMenu:
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue(
                             user_id=user_id,
                             channel_id=channel_id,
-                            value=value + 1
+                            posts_number=value + 1
                         ))
         keyboard.button(text="🔙Back",
                         callback_data=CallbackClasses.ChannelCallbacks.EditChannelCallback(
