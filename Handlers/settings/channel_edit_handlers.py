@@ -177,3 +177,38 @@ async def process_template_text(message: Message, state: FSMContext):
         await message.answer(text=f"{text}\n\n❌Error", reply_markup=keyboard.as_markup(), parse_mode="Markdown")
     await state.clear()
     return
+
+
+async def edit_posts_number_menu_handler(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    keyboard = await EditSingleChannelMenu.get_posts_number_menu(user_id, channel_id)
+    text = Text.get_posts_number_text(channel_id=channel_id)
+    await query.message.edit_text(text=f"{text}", reply_markup=keyboard.as_markup())
+    return
+
+
+async def edit_posts_number_value_handler(query: CallbackQuery):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    posts_number = int(query.data.split(":")[3])
+    if posts_number < 1 or posts_number > 10:
+        try:
+            keyboard = await EditSingleChannelMenu.get_posts_number_menu(user_id, channel_id)
+            await query.message.edit_text(
+                text="❌Posts number cannot be smaller than 1 and bigger than 10\n",
+                reply_markup=keyboard.as_markup())
+            return
+        except TelegramBadRequest:
+            await query.answer()
+            return
+    data = {
+        "posts_number": posts_number
+    }
+    result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
+    keyboard = await EditSingleChannelMenu.get_posts_number_menu(user_id, channel_id)
+    text = Text.get_posts_number_text(channel_id=channel_id)
+    if result:
+        await query.message.edit_text(text=f"{text}\n\n✅Success", reply_markup=keyboard.as_markup())
+    else:
+        await query.message.edit_text(text=f"{text}\n\n❌Error", reply_markup=keyboard.as_markup())

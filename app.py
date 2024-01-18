@@ -1,6 +1,6 @@
 import setup
-
 import asyncio
+import logging
 
 from aiogram import F
 from aiogram.filters import StateFilter
@@ -12,8 +12,6 @@ from Utils.classes import CallbackClasses
 from Utils.forms import CreatePost, EditChannels, AdminPanel
 from Utils.functions import Text
 from loader import dp, bot
-
-import logging
 
 
 @dp.message(Text.is_text("/start"), StateFilter(None))
@@ -279,6 +277,16 @@ async def edit_template_handler(query: CallbackQuery):
 @dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditTemplateValue.filter())
 async def edit_template_value_handler(query: CallbackQuery, state: FSMContext):
     await Handlers.ask_for_template_text(query, state)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberMenu.filter())
+async def edit_posts_number_menu_handler(query: CallbackQuery):
+    await Handlers.edit_posts_number_menu_handler(query)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue.filter())
+async def edit_posts_number_value_handler(query: CallbackQuery):
+    await Handlers.edit_posts_number_value_handler(query)
 
 
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())
