@@ -1,5 +1,3 @@
-import uvicorn
-
 import setup
 
 import asyncio
@@ -66,11 +64,6 @@ async def template_handler(message: Message, state: FSMContext):
 @dp.message()
 async def handle_markup(message: Message, state: FSMContext):
     await Handlers.handle_markup(message, state)
-
-
-@dp.callback_query(StateFilter(CreatePost.waiting_for_submit))
-async def callback_handler(query: Message, state: FSMContext):
-    await Handlers.submit_handler(query, state)
 
 
 @dp.callback_query(CallbackClasses.ChannelCallbacks.EditChannelsCallback.filter())
