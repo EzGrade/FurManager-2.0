@@ -381,12 +381,12 @@ class Text:
 
     @staticmethod
     @sync_to_async
-    def format_caption(caption_str: str, channel_id: int):
+    def format_caption(caption_str: str | None, channel_id: int):
         channel = ChannelModel.objects.get(channel_id=channel_id)
         template = channel.caption_template
         if template is None:
             return caption_str
-        if "%text%" in template:
+        if "%text%" in template and caption_str is not None
             template = template.replace("%text%", caption_str)
         if "%channel name%" in template:
             template = template.replace("%channel name%", channel.channel_name)
