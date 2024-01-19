@@ -15,8 +15,9 @@ async def photo_handler(message: Message, state: FSMContext):
 
 async def finish_handler(message: Message, state: FSMContext):
     data = await state.get_data()
+    caption_to_db = message.text.replace(".", "\.") if message.text != "." else ""
     caption = message.text if message.text != "." else ""
-    await state.update_data(caption=caption)
+    await state.update_data(caption=caption_to_db)
     keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
     await message.answer_photo(photo=data["photo"], caption=caption,
                                reply_markup=keyboard.as_markup())
@@ -97,6 +98,7 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
                                  parse_mode="MarkdownV2")
             await query.message.answer(text=f"✅Successfully posted in {channel_obj.channel_name}")
         except Exception as e:
+            print(e)
             not_success += [channel_obj.channel_name]
     if len(not_success) == 0:
         await query.message.answer(text="✅Successfully posted in all channels")
