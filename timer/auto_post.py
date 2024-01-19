@@ -123,6 +123,8 @@ class AutoPost:
             to_compare = last_post if last_post is not None else start_point
             if self.__GetCurrentTime() - to_compare < channel_delay:
                 continue
+            if (self.__GetCurrentTime() - to_compare) % channel_delay != 0:
+                continue
             for _ in range(channel_posts_number):
                 post = await self.__GetPost(channel)
                 if post is not None:
@@ -140,7 +142,7 @@ class AutoPost:
         while True:
             channels = await self.__GetChannels()
             await self.__Run(channels=channels)
-            await asyncio.sleep(5)
+            await asyncio.sleep(45)
 
 
 if __name__ == '__main__':
