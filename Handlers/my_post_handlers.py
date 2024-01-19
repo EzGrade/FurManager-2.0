@@ -23,8 +23,11 @@ async def my_posts_main(query: CallbackQuery):
             page = page
         post = posts[page - 1]
 
+        caption = post["caption"]
+        if "\." in caption:
+            caption = caption.replace("\.", ".")
         keyboard = await MyPosts.get_my_posts(user_id=user_id, page=page)
-        photo = InputMediaPhoto(media=post["photo"], caption=post["caption"])
+        photo = InputMediaPhoto(media=post["photo"], caption=captiong)
         try:
             await query.message.edit_media(media=photo,
                                            reply_markup=keyboard.as_markup())
