@@ -71,7 +71,7 @@ async def post_to_queue_callback_handler(query: CallbackQuery, state: FSMContext
         channels.append(channel_obj.pk)
     post_data = {
         "photo": state_data["photo"] if state_data["photo"] else None,
-        "media_type": "photo" if state_data["photo"] else "gif",
+        "media_type": "photo" if state_data.get("photo", None) is not None else "gif",
         "caption": state_data["caption"] if state_data["caption"] else None,
     }
     post = await functions.Post.create_post(post_data)
