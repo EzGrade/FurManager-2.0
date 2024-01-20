@@ -1,3 +1,4 @@
+import setup
 import asyncio
 import logging
 
@@ -300,6 +301,7 @@ async def edit_posts_number_value_handler(query: CallbackQuery):
 
 @dp.callback_query(CallbackClasses.AdminPanel.GlobalMessage.filter())
 async def global_message_handler(query: CallbackQuery, state: FSMContext):
+    print("Global message")
     await Handlers.global_message_handler(query, state)
 
 

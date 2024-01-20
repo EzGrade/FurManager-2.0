@@ -295,9 +295,10 @@ class User:
 
     @staticmethod
     @sync_to_async
-    def get_all_users() -> typing.List[UserModel]:
+    def get_all_user_ids() -> typing.List[int]:
         users = UserModel.objects.all()
-        return users
+        ids = [i.user_id for i in users]
+        return ids
 
 
 class Channel:
