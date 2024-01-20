@@ -1,4 +1,3 @@
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
@@ -11,8 +10,10 @@ from loader import bot
 async def photo_handler(message: Message, state: FSMContext):
     if message.photo is not None:
         await state.update_data(photo=message.photo[-1].file_id)
+        await state.update_data(type="photo")
     elif message.animation is not None:
-        await state.update_data(photo=message.animation.file_id)
+        await state.update_data(animation=message.animation.file_id)
+        await state.update_data(type="gif")
     await message.answer("⌨️Send me caption for your post or . to skip it")
     await state.set_state(CreatePost.waiting_for_text)
 
@@ -23,11 +24,11 @@ async def finish_handler(message: Message, state: FSMContext):
     caption = message.text if message.text != "." else ""
     await state.update_data(caption=caption_to_db)
     keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
-    try:
+    if data["type"] == "photo":
         await message.answer_photo(photo=data["photo"], caption=caption,
                                    reply_markup=keyboard.as_markup())
-    except TelegramBadRequest:
-        await message.answer_animation(animation=data["photo"], caption=caption, reply_markup=keyboard.as_markup())
+    elif data["type"] == "gif":
+        await message.answer_animation(animation=data["animation"], caption=caption, reply_markup=keyboard.as_markup())
 
 
 async def change_list_of_channels(query: CallbackQuery, state: FSMContext):
@@ -70,6 +71,7 @@ async def post_to_queue_callback_handler(query: CallbackQuery, state: FSMContext
         channels.append(channel_obj.pk)
     post_data = {
         "photo": state_data["photo"] if state_data["photo"] else None,
+        "media_type": "photo" if state_data["photo"] else "gif",
         "caption": state_data["caption"] if state_data["caption"] else None,
     }
     post = await functions.Post.create_post(post_data)
@@ -92,6 +94,7 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
         checked_channels_list = []
     json_data = {
         "photo": state_data["photo"] if state_data["photo"] else None,
+        "media_type": "photo" if state_data["photo"] else "gif",
         "caption": state_data["caption"] if state_data["caption"] else None,
         "channels": checked_channels_list
     }
@@ -101,8 +104,12 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
         channel_obj = await functions.Channel.get_channel(post_object)
         try:
             caption = await functions.Text.format_caption(json_data["caption"], channel_obj.channel_id)
-            await bot.send_photo(chat_id=channel_obj.channel_id, photo=json_data["photo"], caption=caption,
-                                 parse_mode="MarkdownV2")
+            if json_data["media_type"] == "photo":
+                await bot.send_photo(chat_id=channel_obj.channel_id, photo=json_data["photo"], caption=caption,
+                                     parse_mode="MarkdownV2")
+            elif json_data["media_type"] == "gif":
+                await bot.send_animation(chat_id=channel_obj.channel_id, animation=json_data["photo"], caption=caption,
+                                         parse_mode="MarkdownV2")
             await query.message.answer(text=f"✅Successfully posted in {channel_obj.channel_name}")
         except Exception as e:
             print(e)

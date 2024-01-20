@@ -6,6 +6,7 @@ from .models import PostsModel
 
 class PostSerializer(serializers.ModelSerializer):
     photo = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    media_type = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     caption = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     channels = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=ChannelModel.objects.all(),
                                                   required=False)

@@ -1,5 +1,5 @@
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import CallbackQuery, InputMediaPhoto, Message
+from aiogram.types import CallbackQuery, InputMediaPhoto, Message, InputMediaAnimation
 
 from Markup.my_posts_markup import MyPosts
 from Utils.functions import Post, Channel, Text
@@ -25,12 +25,20 @@ async def my_posts_main(query: CallbackQuery | Message):
 
         caption = post["caption"]
         keyboard = await MyPosts.get_my_posts(user_id=user_id, page=page)
-        photo = InputMediaPhoto(media=post["photo"], caption=caption, parse_mode="MarkdownV2")
-        try:
-            await query.message.edit_media(media=photo,
-                                           reply_markup=keyboard.as_markup())
-        except TelegramBadRequest:
-            await query.answer()
+        if post["type"] == "photo":
+            photo = InputMediaPhoto(media=post["photo"], caption=caption, parse_mode="MarkdownV2")
+            try:
+                await query.message.edit_media(media=photo,
+                                               reply_markup=keyboard.as_markup())
+            except TelegramBadRequest:
+                await query.answer()
+        elif post["type"] == "gif":
+            photo = InputMediaAnimation(media=post["photo"], caption=caption, parse_mode="MarkdownV2")
+            try:
+                await query.message.edit_media(media=photo,
+                                               reply_markup=keyboard.as_markup())
+            except TelegramBadRequest:
+                await query.answer()
     else:
         user_id = query.from_user.id
         page = 1
@@ -40,10 +48,10 @@ async def my_posts_main(query: CallbackQuery | Message):
             return
         post = posts[0]
         keyboard = await MyPosts.get_my_posts(user_id=user_id, page=page)
-        try:
+        if post["type"] == "photo":
             await query.answer_photo(photo=post["photo"], caption=post["caption"],
                                      reply_markup=keyboard.as_markup())
-        except TelegramBadRequest:
+        elif post["type"] == "gif":
             await query.answer_animation(animation=post["photo"], caption=post["caption"],
                                          reply_markup=keyboard.as_markup())
 
@@ -58,8 +66,12 @@ async def my_posts_main_back(query: CallbackQuery):
     post = posts[0]
     await query.message.delete()
     keyboard = await MyPosts.get_my_posts(user_id=user_id, page=page)
-    await query.message.answer_photo(photo=post["photo"], caption=post["caption"],
-                                     reply_markup=keyboard.as_markup())
+    if post["type"] == "photo":
+        await query.message.answer_photo(photo=post["photo"], caption=post["caption"],
+                                         reply_markup=keyboard.as_markup())
+    elif post["type"] == "gif":
+        await query.message.answer_animation(animation=post["photo"], caption=post["caption"],
+                                             reply_markup=keyboard.as_markup())
 
 
 async def delete_post_handler(query: CallbackQuery):
@@ -84,7 +96,10 @@ async def post_now_handler(query: CallbackQuery):
     for channel in channels:
         try:
             caption = await Text.format_caption(post["caption"], channel["id"])
-            await bot.send_photo(chat_id=channel["id"], photo=post["photo"], caption=caption)
+            if post["type"] == "photo":
+                await bot.send_photo(chat_id=channel["id"], photo=post["photo"], caption=caption)
+            elif post["type"] == "gif":
+                await bot.send_animation(chat_id=channel["id"], animation=post["photo"], caption=caption)
             await query.message.answer(f"Posted to {channel['name']}")
         except TelegramBadRequest:
             failed.append(channel)
