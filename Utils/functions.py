@@ -386,8 +386,11 @@ class Text:
         template = channel.caption_template
         if template is None:
             return caption_str
-        if "%text%" in template and caption_str is not None:
-            template = template.replace("%text%", caption_str)
+        if "%text%" in template:
+            if caption_str is not None:
+                template = template.replace("%text%", caption_str)
+            else:
+                template = template.replace("%text%", "")
         if "%channel name%" in template:
             template = template.replace("%channel name%", channel.channel_name)
         if "%channel id%" in template:
