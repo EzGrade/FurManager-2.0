@@ -66,7 +66,12 @@ class Post:
     def get_post(post_id: int) -> PostsModel:
         post = PostsModel.objects.get(pk=post_id)
         channels = [{"name": i.channel_name, "id": i.channel_id} for i in post.channels.all()]
-        return {"pk": post.pk, "photo": post.photo, "caption": post.caption, "channels": channels}
+        return {
+            "pk": post.pk,
+            "photo": post.photo,
+            "media_type": post.media_type,
+            "caption": post.caption,
+            "channels": channels}
 
     @staticmethod
     @sync_to_async
