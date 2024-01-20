@@ -32,9 +32,13 @@ class AutoPost:
             self,
             channel_id: int,
             image: str,
-            text: str
+            text: str,
+            media_type: str
     ) -> None:
-        await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text, parse_mode="MarkdownV2")
+        if media_type == "gif":
+            await self.bot.send_animation(chat_id=channel_id, animation=image, caption=text, parse_mode="MarkdownV2")
+        elif media_type == "photo":
+            await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text, parse_mode="MarkdownV2")
         await self.__UpdateLastPost(channel_id)
 
     @sync_to_async
@@ -129,7 +133,7 @@ class AutoPost:
                 post = await self.__GetPost(channel)
                 if post is not None:
                     caption = await Text.format_caption(post.caption, channel)
-                    task = asyncio.create_task(self.__SendPost(channel, post.photo, caption))
+                    task = asyncio.create_task(self.__SendPost(channel, post.photo, caption, post.media_type))
                     tasks.append(task)
                     await self.__RemoveChannel(channel, post)
 

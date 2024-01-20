@@ -92,8 +92,9 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
         checked_channels_list = state_data["checked_channels_list"]
     except KeyError:
         checked_channels_list = []
+    media = state_data["photo"] if state_data.get("photo", None) is not None else state_data["animation"]
     json_data = {
-        "photo": state_data["photo"] if state_data["photo"] else None,
+        "photo": media,
         "media_type": "photo" if state_data["photo"] else "gif",
         "caption": state_data["caption"] if state_data["caption"] else None,
         "channels": checked_channels_list
