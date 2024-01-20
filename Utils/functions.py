@@ -40,7 +40,13 @@ class Post:
         for channel in user_obj.channel_id:
             posts = PostsModel.objects.filter(channels__channel_id__contains=channel)
             for post in posts:
-                post_json = {"pk": post.pk, "photo": post.photo, "caption": post.caption, "channels": post.channels}
+                post_json = {
+                    "pk": post.pk,
+                    "photo": post.photo,
+                    "media_type": post.media_type,
+                    "caption": post.caption,
+                    "channels": post.channels
+                }
                 if post_json not in result:
                     result.append(post_json)
         return result
