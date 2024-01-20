@@ -69,8 +69,9 @@ async def post_to_queue_callback_handler(query: CallbackQuery, state: FSMContext
     for channel_id in state_data["checked_channels_list"]:
         channel_obj = await functions.Channel.get_channel(channel_id)
         channels.append(channel_obj.pk)
+    media = state_data["photo"] if state_data.get("photo", None) is not None else state_data["animation"]
     post_data = {
-        "photo": state_data["photo"] if state_data["photo"] else None,
+        "photo": media,
         "media_type": "photo" if state_data.get("photo", None) is not None else "gif",
         "caption": state_data["caption"] if state_data["caption"] else None,
     }
