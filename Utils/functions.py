@@ -21,6 +21,19 @@ class Post:
     def create_post(
             post: typing.Dict
     ) -> bool:
+        """
+        Asynchronously creates a post using the provided data.
+
+        This method takes a dictionary representing a post, validates it using the PostSerializer,
+        and if valid, saves it to the database. If the post is successfully saved, it returns the
+        instance of the saved post. If the post is not valid, it returns False.
+
+        Parameters:
+        post (typing.Dict): A dictionary containing the data for the post to be created.
+
+        Returns:
+        bool: True if the post was successfully created and saved, False otherwise.
+        """
         serializer = PostSerializer(
             data=post
         )
@@ -35,6 +48,19 @@ class Post:
             post_id: int,
             channels: typing.List[int]
     ) -> bool:
+        """
+        Asynchronously sets the channels for a specific post.
+
+        This method takes a post ID and a list of channel IDs. It retrieves the post
+        corresponding to the given post ID and sets its channels to the provided list of channel IDs.
+
+        Parameters:
+        post_id (int): The ID of the post to update.
+        channels (typing.List[int]): A list of channel IDs to set for the post.
+
+        Returns:
+        bool: True if the operation was successful, False otherwise.
+        """
         post = PostSerializer(
             instance=PostsModel.objects.get(
                 pk=post_id
@@ -47,6 +73,20 @@ class Post:
     def get_posts_by_user(
             user_id: int
     ) -> PostsModel:
+        """
+        Asynchronously retrieves all posts associated with a specific user.
+
+        This method takes a user ID, retrieves the user object associated with that ID, and then
+        retrieves all posts associated with the channels that the user is part of. It returns a list
+        of dictionaries, each representing a post.
+
+        Parameters:
+        user_id (int): The ID of the user whose posts are to be retrieved.
+
+        Returns:
+        list[dict]: A list of dictionaries, each representing a post. Each dictionary contains the
+        post's primary key, photo, media type, caption, and associated channels.
+        """
         user_obj = UserModel.objects.get(
             user_id=user_id
         )
@@ -72,6 +112,19 @@ class Post:
     def delete_post(
             post_id: int
     ) -> bool:
+        """
+        Asynchronously deletes a post by its ID.
+
+        This method attempts to retrieve a post by its ID and delete it.
+        If the post is successfully deleted, it returns True.
+        If the post does not exist, it returns False.
+
+        Parameters:
+        post_id (int): The ID of the post to be deleted.
+
+        Returns:
+        bool: True if the post was successfully deleted, False otherwise.
+        """
         try:
             post = PostsModel.objects.get(
                 pk=post_id
@@ -86,6 +139,21 @@ class Post:
     def get_post(
             post_id: int
     ) -> PostsModel:
+        """
+        Asynchronously retrieves a post by its ID and its associated channels.
+
+        This method takes a post ID, retrieves the post object associated with that ID, and then
+        retrieves all channels associated with the post. It returns a dictionary representing the post
+        and its associated channels.
+
+        Parameters:
+        post_id (int): The ID of the post to be retrieved.
+
+        Returns:
+        dict: A dictionary representing the post. The dictionary contains the post's primary key, photo,
+        media type, caption, and a list of dictionaries each representing a channel associated with the post.
+        Each channel dictionary contains the channel's name and ID.
+        """
         post = PostsModel.objects.get(
             pk=post_id
         )
@@ -99,7 +167,8 @@ class Post:
             "photo": post.photo,
             "media_type": post.media_type,
             "caption": post.caption,
-            "channels": channels}
+            "channels": channels
+        }
 
     @staticmethod
     @sync_to_async
@@ -107,6 +176,20 @@ class Post:
             post_id: int,
             post_data: typing.Dict
     ) -> bool:
+        """
+        Asynchronously updates a post with the provided data.
+
+        This method takes a post ID and a dictionary representing the new data for the post.
+        It retrieves the post object associated with the given ID and updates it with the new data.
+        If the new data is valid, it saves the updated post and returns True. If the new data is not valid, it returns False.
+
+        Parameters:
+        post_id (int): The ID of the post to be updated.
+        post_data (typing.Dict): A dictionary containing the new data for the post.
+
+        Returns:
+        bool: True if the post was successfully updated and saved, False otherwise.
+        """
         post_obj = PostsModel.objects.get(
             pk=post_id
         )
@@ -127,6 +210,17 @@ class Post:
     def get_post_obj(
             post_id: int
     ) -> PostsModel:
+        """
+        Asynchronously retrieves a post object by its ID.
+
+        This method takes a post ID and retrieves the post object associated with that ID from the database.
+
+        Parameters:
+        post_id (int): The ID of the post to be retrieved.
+
+        Returns:
+        PostsModel: The post object associated with the given ID.
+        """
         return PostsModel.objects.get(
             pk=post_id
         )
@@ -139,6 +233,17 @@ class User:
     def get_user(
             user_id: int
     ) -> UserModel:
+        """
+        Asynchronously retrieves a user object by its ID.
+
+        This method takes a user ID and retrieves the user object associated with that ID from the database.
+
+        Parameters:
+        user_id (int): The ID of the user to be retrieved.
+
+        Returns:
+        UserModel: The user object associated with the given ID.
+        """
         user_obj = UserModel.objects.get(
             user_id=user_id
         )
@@ -187,6 +292,12 @@ class User:
             pk=channel.channel_holder.pk
         )
         return user
+
+    @staticmethod
+    @sync_to_async
+    def get_all_users() -> typing.List[UserModel]:
+        users = UserModel.objects.all()
+        return users
 
 
 class Channel:
@@ -605,3 +716,23 @@ class Text:
             text: str
     ) -> bool:
         return F.text == text
+
+    @staticmethod
+    @sync_to_async
+    def admin_panel_text() -> str:
+        users_number = UserModel.objects.count()
+        channels_number = ChannelModel.objects.count()
+        posts_number = PostsModel.objects.count()
+        post_per_user = posts_number / users_number
+        post_per_channel = posts_number / channels_number
+        channel_per_user = channels_number / users_number
+        text = (
+            f"📊Admin panel\n"
+            f"ℹ️Users number: {users_number}\n"
+            f"  ℹ️Posts per user: {post_per_user}\n"
+            f"  ℹ️Channels per user: {channel_per_user}\n"
+            f"ℹ️Posts number: {posts_number}\n"
+            f"  ℹ️Posts per channel: {post_per_channel}\n"
+            f"ℹ️Channels number: {channels_number}\n"
+        )
+        return text

@@ -248,3 +248,7 @@ class CallbackClasses:
 
         class BackToMain(CallbackData, prefix="back_to_main"):
             user_id: int
+
+    class AdminPanel(CallbackData, prefix="admin_panel"):
+        class GlobalMessage(CallbackData, prefix="global_message"):
+            user_id: int

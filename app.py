@@ -1,8 +1,8 @@
-import setup
 import asyncio
 import logging
 
 from aiogram import F
+from aiogram.filters import CommandStart, Command
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
@@ -10,26 +10,25 @@ from aiogram.types import Message, CallbackQuery
 import Handlers
 from Utils.classes import CallbackClasses
 from Utils.forms import CreatePost, EditChannels, AdminPanel
-from Utils.functions import Text
 from loader import dp, bot
 
 
-@dp.message(Text.is_text("/start"), StateFilter(None))
+@dp.message(CommandStart(), StateFilter(None))
 async def start_handler(message: Message):
     await Handlers.start_handler(message)
 
 
-@dp.message(Text.is_text("/help"))
+@dp.message(Command("help"))
 async def help_handler(message: Message):
     await Handlers.help_handler(message)
 
 
-@dp.message(Text.is_text("/settings"))
+@dp.message(Command("settings"))
 async def settings_handler(message: Message):
     await Handlers.settings_handler(message)
 
 
-@dp.message(Text.is_text("/cancel"))
+@dp.message(Command("cancel"))
 async def cancel_handler(message: Message, state: FSMContext):
     await Handlers.cancel_handler(message, state)
 
@@ -57,6 +56,16 @@ async def admin_enter_link_handler(message: Message, state: FSMContext):
 @dp.message(StateFilter(EditChannels.waiting_for_template))
 async def template_handler(message: Message, state: FSMContext):
     await Handlers.process_template_text(message, state)
+
+
+@dp.message(StateFilter(AdminPanel.waiting_for_global))
+async def send_global_message_handler(message: Message, state: FSMContext):
+    await Handlers.send_global_message_handler(message, state)
+
+
+@dp.message(Command("admin"))
+async def admin_panel_handler(message: Message):
+    await Handlers.admin_handler(message)
 
 
 @dp.message()
@@ -287,6 +296,11 @@ async def edit_posts_number_menu_handler(query: CallbackQuery):
 @dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditPostsNumberValue.filter())
 async def edit_posts_number_value_handler(query: CallbackQuery):
     await Handlers.edit_posts_number_value_handler(query)
+
+
+@dp.callback_query(CallbackClasses.AdminPanel.GlobalMessage.filter())
+async def global_message_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.global_message_handler(query, state)
 
 
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())

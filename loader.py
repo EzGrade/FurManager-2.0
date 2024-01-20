@@ -6,6 +6,8 @@ TOKENS = {
     "PROD": "6955659259:AAFrkK1TrJQSSMhLUy1O2xcEU-DUAJlLeJo"
 }
 
+admins = [1019900002]
+
 DEV = False
 
 if DEV:
