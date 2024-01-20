@@ -1,12 +1,12 @@
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import CallbackQuery, InputMediaPhoto
+from aiogram.types import CallbackQuery, InputMediaPhoto, Message
 
 from Markup.my_posts_markup import MyPosts
 from Utils.functions import Post, Channel, Text
 from loader import bot
 
 
-async def my_posts_main(query: CallbackQuery):
+async def my_posts_main(query: CallbackQuery | Message):
     if isinstance(query, CallbackQuery):
         query_data = query.data.split(":")
         user_id = int(query_data[1])
@@ -40,8 +40,12 @@ async def my_posts_main(query: CallbackQuery):
             return
         post = posts[0]
         keyboard = await MyPosts.get_my_posts(user_id=user_id, page=page)
-        await query.answer_photo(photo=post["photo"], caption=post["caption"],
-                                 reply_markup=keyboard.as_markup())
+        try:
+            await query.answer_photo(photo=post["photo"], caption=post["caption"],
+                                     reply_markup=keyboard.as_markup())
+        except TelegramBadRequest:
+            await query.answer_animation(animation=post["photo"], caption=post["caption"],
+                                         reply_markup=keyboard.as_markup())
 
 
 async def my_posts_main_back(query: CallbackQuery):

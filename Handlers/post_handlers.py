@@ -1,3 +1,4 @@
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
@@ -8,7 +9,10 @@ from loader import bot
 
 
 async def photo_handler(message: Message, state: FSMContext):
-    await state.update_data(photo=message.photo[-1].file_id)
+    if message.photo is not None:
+        await state.update_data(photo=message.photo[-1].file_id)
+    elif message.animation is not None:
+        await state.update_data(photo=message.animation.file_id)
     await message.answer("⌨️Send me caption for your post or . to skip it")
     await state.set_state(CreatePost.waiting_for_text)
 
@@ -19,8 +23,11 @@ async def finish_handler(message: Message, state: FSMContext):
     caption = message.text if message.text != "." else ""
     await state.update_data(caption=caption_to_db)
     keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
-    await message.answer_photo(photo=data["photo"], caption=caption,
-                               reply_markup=keyboard.as_markup())
+    try:
+        await message.answer_photo(photo=data["photo"], caption=caption,
+                                   reply_markup=keyboard.as_markup())
+    except TelegramBadRequest:
+        await message.answer_animation(animation=data["photo"], caption=caption, reply_markup=keyboard.as_markup())
 
 
 async def change_list_of_channels(query: CallbackQuery, state: FSMContext):
