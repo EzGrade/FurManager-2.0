@@ -1,4 +1,5 @@
 import setup
+
 setup.setup_django()
 import asyncio
 import logging
@@ -313,6 +314,11 @@ async def global_message_handler(query: CallbackQuery, state: FSMContext):
 @dp.callback_query(CallbackClasses.AdminPanel.GlobalForward.filter())
 async def global_forward_handler(query: CallbackQuery, state: FSMContext):
     await Handlers.global_forward_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.EditSingleChannelCallbacks.EditEnhanceLinks.filter())
+async def edit_enhance_links_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.edit_enhance_links_handler(query, state)
 
 
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())

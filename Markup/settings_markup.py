@@ -106,8 +106,18 @@ class EditSingleChannelMenu:
             active_text = "❌Disable"
         else:
             active_text = "✅Enable"
+
+        if channel_obj.enhance_links:
+            enhance_text = "❌Disable Enhance Links"
+        else:
+            enhance_text = "✅Enable Enhance Links"
         keyboard.button(text=active_text,
                         callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelActiveCallback(
+                            user_id=user_id,
+                            channel_id=channel_id
+                        ))
+        keyboard.button(text=enhance_text,
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditEnhanceLinks(
                             user_id=user_id,
                             channel_id=channel_id
                         ))

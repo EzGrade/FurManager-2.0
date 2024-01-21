@@ -186,6 +186,10 @@ class CallbackClasses:
             channel_id: int
             posts_number: int
 
+        class EditEnhanceLinks(CallbackData, prefix="edit_enhance_links"):
+            user_id: int
+            channel_id: int
+
     class SettingsCallbacks:
         class SettingsMenuCallback(CallbackData, prefix="settings_menu"):
             user_id: int

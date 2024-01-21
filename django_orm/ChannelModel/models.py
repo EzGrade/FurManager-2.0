@@ -16,4 +16,5 @@ class ChannelModel(models.Model):
     last_post = models.DateTimeField(blank=True, null=True, editable=True)
     caption_template = models.CharField(max_length=200, blank=True, null=True)
     posts_number = models.IntegerField(default=1)
+    enhance_links = models.BooleanField(default=True)
     active = models.BooleanField(default=True)

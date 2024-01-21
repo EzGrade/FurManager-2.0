@@ -1,4 +1,5 @@
 import datetime
+import re
 import secrets
 import typing
 
@@ -589,7 +590,8 @@ class Text:
                 f'  📅Last post: {last_post}\n'
                 f'  📅Next post: {next_post}\n\n'
                 f'👥Admins:\n{admins_text}\n\n'
-                f'Active: {"✅" + str(channel_obj.active) if channel_obj.active else "❌" + str(channel_obj.active)}\n')
+                f'Active: {"✅" + str(channel_obj.active) if channel_obj.active else "❌" + str(channel_obj.active)}\n'
+                f'Enhance links: {"✅" + str(channel_obj.enhance_links) if channel_obj.enhance_links else "❌" + str(channel_obj.enhance_links)}\n\n')
         return text
 
     @staticmethod
@@ -673,6 +675,33 @@ class Text:
             return warning
 
     @staticmethod
+    def process_caption_links(text: str) -> str:
+        links = {
+            "https://www.furaffinity.net/": "Furaffinity",
+            "https://e621.net/": "e621",
+            "https://www.furrynetwork.com/": "FurryNetwork",
+            "https://twitter.com/": "Twitter",
+            "https://rule34.xxx/": "Rule34",
+        }
+
+        # Split the text into words and delimiters
+        words = re.split(' |\n|,', text)
+        delimiters = re.findall(' |\n|,', text)
+
+        # Process the words
+        for index, word in enumerate(words):
+            for link in links:
+                if word.startswith(link):
+                    words[index] = f"[{links[link]}]({word})"
+
+        # Join the words with the corresponding delimiters
+        result = ''
+        for word, delimiter in zip(words, delimiters + ['']):
+            result += word + delimiter
+
+        return result
+
+    @staticmethod
     @sync_to_async
     def format_caption(
             caption_str: str | None,
@@ -684,6 +713,8 @@ class Text:
             return caption_str
         if "%text%" in template:
             if caption_str is not None:
+                if channel.enhance_links:
+                    caption_str = Text.process_caption_links(caption_str)
                 template = template.replace("%text%", caption_str)
             else:
                 template = template.replace("%text%", "")

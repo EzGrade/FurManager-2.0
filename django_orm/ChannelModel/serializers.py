@@ -15,6 +15,7 @@ class ChannelSerializer(serializers.Serializer):
     last_post = serializers.DateTimeField(required=False, allow_null=True)
     caption_template = serializers.CharField(required=False, max_length=200, allow_blank=True, allow_null=True)
     posts_number = serializers.IntegerField(required=False, default=1)
+    enhance_links = serializers.BooleanField(required=False, default=True)
     active = serializers.BooleanField(required=False, default=False)
 
     def create(self, validated_data):
@@ -33,6 +34,7 @@ class ChannelSerializer(serializers.Serializer):
         instance.last_post = validated_data.get('last_post', instance.last_post)
         instance.caption_template = validated_data.get('caption_template', instance.caption_template)
         instance.posts_number = validated_data.get('posts_number', instance.posts_number)
+        instance.enhance_links = validated_data.get('enhance_links', instance.enhance_links)
         instance.active = validated_data.get('active', instance.active)
         instance.save()
         return instance

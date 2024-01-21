@@ -212,3 +212,20 @@ async def edit_posts_number_value_handler(query: CallbackQuery):
         await query.message.edit_text(text=f"{text}\n\n✅Success", reply_markup=keyboard.as_markup())
     else:
         await query.message.edit_text(text=f"{text}\n\n❌Error", reply_markup=keyboard.as_markup())
+
+
+async def edit_enhance_links_handler(query: CallbackQuery, state: FSMContext):
+    user_id = int(query.data.split(":")[1])
+    channel_id = int(query.data.split(":")[2])
+    channel_obj = await Channel.get_channel(channel_id=channel_id)
+    data = {
+        "enhance_links": not channel_obj.enhance_links
+    }
+    result = await Channel.update_channel(channel_id=channel_id, channel_data=data)
+    keyboard = await EditSingleChannelMenu.get_main_menu(user_id=user_id, channel_id=channel_id)
+    text = await Text.get_channel_settings_text(channel_id=channel_id)
+    if result:
+        await query.message.edit_text(text=f"{text}\n\n✅Success", reply_markup=keyboard.as_markup())
+    else:
+        await query.message.edit_text(text=f"{text}\n\n❌Error", reply_markup=keyboard.as_markup())
+    return

@@ -8,7 +8,7 @@ TOKENS = {
 
 admins = [1019900002]
 
-DEV = False
+DEV = True
 
 if DEV:
     TOKEN = TOKENS["DEV"]
