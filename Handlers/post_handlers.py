@@ -17,8 +17,23 @@ async def photo_handler(message: Message, state: FSMContext):
     elif message.video is not None:
         await state.update_data(video=message.video.file_id)
         await state.update_data(type="video")
-    await message.answer("⌨️Send me caption for your post or . to skip it")
-    await state.set_state(CreatePost.waiting_for_text)
+    if message.caption is not None:
+        caption = message.text.replace(".", "\.") if message.text != "." else ""
+        await state.update_data(caption=caption)
+        keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
+        data = await state.get_data()
+        if data["type"] == "photo":
+            await message.answer_photo(photo=data["photo"], caption=caption,
+                                       reply_markup=keyboard.as_markup(), parse_mode="MarkdownV2")
+        elif data["type"] == "gif":
+            await message.answer_animation(animation=data["animation"], caption=caption,
+                                           reply_markup=keyboard.as_markup(), parse_mode="MarkdownV2")
+        elif data["type"] == "video":
+            await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup(),
+                                       parse_mode="MarkdownV2")
+    else:
+        await message.answer("⌨️Send me caption for your post or . to skip it")
+        await state.set_state(CreatePost.waiting_for_text)
 
 
 async def finish_handler(message: Message, state: FSMContext):
