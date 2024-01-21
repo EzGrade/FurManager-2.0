@@ -129,6 +129,9 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
             elif json_data["media_type"] == "gif":
                 await bot.send_animation(chat_id=channel_obj.channel_id, animation=json_data["photo"], caption=caption,
                                          parse_mode="MarkdownV2")
+            elif json_data["media_type"] == "video":
+                await bot.send_video(chat_id=channel_obj.channel_id, video=json_data["photo"], caption=caption,
+                                     parse_mode="MarkdownV2")
             await query.message.answer(text=f"✅Successfully posted in {channel_obj.channel_name}")
         except Exception as e:
             print(e)
