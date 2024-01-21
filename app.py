@@ -1,4 +1,3 @@
-import setup
 import asyncio
 import logging
 
@@ -67,6 +66,11 @@ async def send_global_message_handler(message: Message, state: FSMContext):
 @dp.message(Command("admin"))
 async def admin_panel_handler(message: Message):
     await Handlers.admin_handler(message)
+
+
+@dp.message(StateFilter(AdminPanel.waiting_for_global_forward))
+async def send_global_forward_handler(message: Message, state: FSMContext):
+    await Handlers.send_global_forward_handler(message, state)
 
 
 @dp.message()
@@ -301,8 +305,12 @@ async def edit_posts_number_value_handler(query: CallbackQuery):
 
 @dp.callback_query(CallbackClasses.AdminPanel.GlobalMessage.filter())
 async def global_message_handler(query: CallbackQuery, state: FSMContext):
-    print("Global message")
     await Handlers.global_message_handler(query, state)
+
+
+@dp.callback_query(CallbackClasses.AdminPanel.GlobalForward.filter())
+async def global_forward_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.global_forward_handler(query, state)
 
 
 @dp.callback_query(CallbackClasses.EmptyCallback.filter())

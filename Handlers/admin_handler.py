@@ -31,3 +31,22 @@ async def send_global_message_handler(message: Message, state: FSMContext):
             except Exception as e:
                 print(e)
         await state.clear()
+
+
+async def global_forward_handler(query: CallbackQuery, state: FSMContext):
+    await query.message.answer(text="Send me message to forward to all users")
+    await query.message.delete_reply_markup()
+    await query.answer()
+    await query.message.delete()
+    await state.set_state(AdminPanel.waiting_for_global_forward)
+
+
+async def send_global_forward_handler(message: Message, state: FSMContext):
+    if message.from_user.id in admins:
+        users = await User.get_all_user_ids()
+        for user in users:
+            try:
+                await message.forward(chat_id=user)
+            except Exception as e:
+                print(e)
+        await state.clear()

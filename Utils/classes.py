@@ -252,3 +252,6 @@ class CallbackClasses:
     class AdminPanel(CallbackData, prefix="admin_panel"):
         class GlobalMessage(CallbackData, prefix="global_message"):
             user_id: int
+
+        class GlobalForward(CallbackData, prefix="global_forward"):
+            user_id: int

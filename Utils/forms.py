@@ -15,4 +15,5 @@ class EditChannels(StatesGroup):
 class AdminPanel(StatesGroup):
     waiting_for_code = State()
     waiting_for_global = State()
+    waiting_for_global_forward = State()
 

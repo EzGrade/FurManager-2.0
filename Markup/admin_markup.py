@@ -12,4 +12,7 @@ class AdminMenu:
         keyboard.button(text="Global Message", callback_data=CallbackClasses.AdminPanel.GlobalMessage(
             user_id=user_id
         ))
+        keyboard.button(text="Global Forward", callback_data=CallbackClasses.AdminPanel.GlobalForward(
+            user_id=user_id
+        ))
         return keyboard
