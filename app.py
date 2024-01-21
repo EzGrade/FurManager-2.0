@@ -34,7 +34,7 @@ async def cancel_handler(message: Message, state: FSMContext):
     await Handlers.cancel_handler(message, state)
 
 
-@dp.message(F.content_type.in_({'photo', 'animation'}), StateFilter(CreatePost.waiting_for_photo))
+@dp.message(F.content_type.in_({'photo', 'animation', 'video'}), StateFilter(CreatePost.waiting_for_photo))
 async def photo_handler(message: Message, state: FSMContext):
     await Handlers.photo_handler(message, state)
 
