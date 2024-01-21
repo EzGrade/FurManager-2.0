@@ -30,3 +30,4 @@ async def send_global_message_handler(message: Message, state: FSMContext):
                 await message.bot.send_message(chat_id=user, text=message.text)
             except Exception as e:
                 print(e)
+        await state.clear()
