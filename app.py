@@ -1,3 +1,5 @@
+import setup
+setup.setup_django()
 import asyncio
 import logging
 
