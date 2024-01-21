@@ -14,6 +14,9 @@ async def photo_handler(message: Message, state: FSMContext):
     elif message.animation is not None:
         await state.update_data(animation=message.animation.file_id)
         await state.update_data(type="gif")
+    elif message.video is not None:
+        await state.update_data(video=message.video.file_id)
+        await state.update_data(type="video")
     await message.answer("⌨️Send me caption for your post or . to skip it")
     await state.set_state(CreatePost.waiting_for_text)
 
@@ -29,6 +32,8 @@ async def finish_handler(message: Message, state: FSMContext):
                                    reply_markup=keyboard.as_markup())
     elif data["type"] == "gif":
         await message.answer_animation(animation=data["animation"], caption=caption, reply_markup=keyboard.as_markup())
+    elif data["type"] == "video":
+        await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup())
 
 
 async def change_list_of_channels(query: CallbackQuery, state: FSMContext):
@@ -69,10 +74,16 @@ async def post_to_queue_callback_handler(query: CallbackQuery, state: FSMContext
     for channel_id in state_data["checked_channels_list"]:
         channel_obj = await functions.Channel.get_channel(channel_id)
         channels.append(channel_obj.pk)
-    media = state_data["photo"] if state_data.get("photo", None) is not None else state_data["animation"]
+    media_type = state_data["type"]
+    if media_type == "photo":
+        media = state_data["photo"]
+    elif media_type == "gif":
+        media = state_data["animation"]
+    elif media_type == "video":
+        media = state_data["video"]
     post_data = {
         "photo": media,
-        "media_type": "photo" if state_data.get("photo", None) is not None else "gif",
+        "media_type": media_type,
         "caption": state_data["caption"] if state_data["caption"] else None,
     }
     post = await functions.Post.create_post(post_data)
@@ -93,10 +104,16 @@ async def post_now_callback_handler(query: CallbackQuery, state: FSMContext):
         checked_channels_list = state_data["checked_channels_list"]
     except KeyError:
         checked_channels_list = []
-    media = state_data["photo"] if state_data.get("photo", None) is not None else state_data["animation"]
+    media_type = state_data["type"]
+    if media_type == "photo":
+        media = state_data["photo"]
+    elif media_type == "gif":
+        media = state_data["animation"]
+    elif media_type == "video":
+        media = state_data["video"]
     json_data = {
         "photo": media,
-        "media_type": "photo" if state_data.get("photo", None) is not None else "gif",
+        "media_type": media_type,
         "caption": state_data["caption"] if state_data["caption"] else None,
         "channels": checked_channels_list
     }

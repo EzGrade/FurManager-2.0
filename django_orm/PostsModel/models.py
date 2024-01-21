@@ -8,6 +8,7 @@ class PostsModel(models.Model):
     MEDIA_TYPES = [
         ('PHOTO', 'Photo'),
         ('GIF', 'Gif'),
+        ('VIDEO', 'Video'),
     ]
 
     photo = models.TextField(blank=True, null=True)

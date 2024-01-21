@@ -39,6 +39,8 @@ class AutoPost:
             await self.bot.send_animation(chat_id=channel_id, animation=image, caption=text, parse_mode="MarkdownV2")
         elif media_type == "photo":
             await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text, parse_mode="MarkdownV2")
+        elif media_type == "video":
+            await self.bot.send_video(chat_id=channel_id, video=image, caption=text, parse_mode="MarkdownV2")
         await self.__UpdateLastPost(channel_id)
 
     @sync_to_async
