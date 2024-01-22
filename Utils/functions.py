@@ -2,6 +2,7 @@ import datetime
 import re
 import secrets
 import typing
+from tldextract import extract
 
 from aiogram import F
 from asgiref.sync import sync_to_async
@@ -676,30 +677,15 @@ class Text:
 
     @staticmethod
     def process_caption_links(text: str) -> str:
-        links = {
-            "https://www.furaffinity.net/": "Furaffinity",
-            "https://e621.net/": "e621",
-            "https://www.furrynetwork.com/": "FurryNetwork",
-            "https://twitter.com/": "Twitter",
-            "https://rule34.xxx/": "Rule34",
-        }
+        url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+        urls = re.findall(url_pattern, text)
 
-        # Split the text into words and delimiters
-        words = re.split(' |\n|,', text)
-        delimiters = re.findall(' |\n|,', text)
+        for url in urls:
+            extract_result = extract(url)
+            td = extract_result.domain
+            text = text.replace(url, f'[{td.capitalize()}]({url})')
 
-        # Process the words
-        for index, word in enumerate(words):
-            for link in links:
-                if word.startswith(link):
-                    words[index] = f"[{links[link]}]({word})"
-
-        # Join the words with the corresponding delimiters
-        result = ''
-        for word, delimiter in zip(words, delimiters + ['']):
-            result += word + delimiter
-
-        return result
+        return text
 
     @staticmethod
     @sync_to_async
