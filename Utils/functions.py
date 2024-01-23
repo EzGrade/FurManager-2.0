@@ -2,11 +2,11 @@ import datetime
 import re
 import secrets
 import typing
-from tldextract import extract
 
 from aiogram import F
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
+from tldextract import extract
 
 from ChannelModel.models import ChannelModel
 from ChannelModel.serializers import ChannelSerializer
@@ -677,14 +677,13 @@ class Text:
 
     @staticmethod
     def process_caption_links(text: str) -> str:
+        text = text.replace("\.", ".")
         url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
         urls = re.findall(url_pattern, text)
-
         for url in urls:
             extract_result = extract(url)
             td = extract_result.domain
             text = text.replace(url, f'[{td.capitalize()}]({url})')
-
         return text
 
     @staticmethod
@@ -696,7 +695,8 @@ class Text:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         template = channel.caption_template
         if template is None:
-            return caption_str
+            caption = Text.process_caption_links(caption_str)
+            return caption
         if "%text%" in template:
             if caption_str is not None:
                 if channel.enhance_links:

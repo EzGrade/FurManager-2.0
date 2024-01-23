@@ -24,13 +24,12 @@ async def photo_handler(message: Message, state: FSMContext):
         data = await state.get_data()
         if data["type"] == "photo":
             await message.answer_photo(photo=data["photo"], caption=caption,
-                                       reply_markup=keyboard.as_markup(), parse_mode="MarkdownV2")
+                                       reply_markup=keyboard.as_markup())
         elif data["type"] == "gif":
             await message.answer_animation(animation=data["animation"], caption=caption,
-                                           reply_markup=keyboard.as_markup(), parse_mode="MarkdownV2")
+                                           reply_markup=keyboard.as_markup())
         elif data["type"] == "video":
-            await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup(),
-                                       parse_mode="MarkdownV2")
+            await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup())
     else:
         await message.answer("⌨️Send me caption for your post or . to skip it")
         await state.set_state(CreatePost.waiting_for_text)
@@ -44,11 +43,13 @@ async def finish_handler(message: Message, state: FSMContext):
     keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
     if data["type"] == "photo":
         await message.answer_photo(photo=data["photo"], caption=caption,
-                                   reply_markup=keyboard.as_markup())
+                                   reply_markup=keyboard.as_markup(), parse_mode="MarkdownV2")
     elif data["type"] == "gif":
-        await message.answer_animation(animation=data["animation"], caption=caption, reply_markup=keyboard.as_markup())
+        await message.answer_animation(animation=data["animation"], caption=caption, reply_markup=keyboard.as_markup(),
+                                       parse_mode="MarkdownV2")
     elif data["type"] == "video":
-        await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup())
+        await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup(),
+                                   parse_mode="MarkdownV2")
 
 
 async def change_list_of_channels(query: CallbackQuery, state: FSMContext):
