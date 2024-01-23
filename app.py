@@ -92,8 +92,8 @@ async def settings_menu_handler(query: CallbackQuery):
 
 
 @dp.callback_query(CallbackClasses.ChannelCallbacks.AddChannelCallback.filter())
-async def add_channel_handler(query: CallbackQuery):
-    await Handlers.add_bot_as_admin(query)
+async def add_channel_handler(query: CallbackQuery, state: FSMContext):
+    await Handlers.add_bot_as_admin(query, state)
 
 
 @dp.callback_query(CallbackClasses.CommandCallbacks.CancelCallback.filter())

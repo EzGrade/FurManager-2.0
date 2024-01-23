@@ -2,7 +2,8 @@ from datetime import datetime, UTC
 
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, KeyboardButton, KeyboardButtonRequestChat
+from aiogram.utils.keyboard import KeyboardBuilder
 
 from Markup.settings_markup import AddChannelMenu, RemoveChannelMenu, EditChannelMenu
 from Utils import forms
@@ -16,26 +17,17 @@ async def get_channels_list(query: CallbackQuery):
                                   reply_markup=AddChannelMenu.add_channel_menu(query.from_user.id).as_markup())
 
 
-async def wait_for_channel_name(query: CallbackQuery, state: FSMContext):
-    await query.message.edit_text("⌨️Enter channel name (Invitation link if it's private channel https://t.me//)")
+async def add_bot_as_admin(query: CallbackQuery, state: FSMContext):
+    keyboard = KeyboardBuilder(KeyboardButton)
+    keyboard.button(text="➕Share channel",
+                    request_chat=KeyboardButtonRequestChat(request_id=query.message.message_id, chat_is_channel=True))
+    await query.message.delete()
+    await query.message.answer(text="Share your channel", reply_markup=keyboard.as_markup())
     await state.set_state(forms.EditChannels.waiting_for_channel_name)
 
 
-async def add_bot_as_admin(query: CallbackQuery):
-    await query.message.edit_text("⏳Please, add bot as admin to your channel and press 'Done' button",
-                                  reply_markup=AddChannelMenu.add_process_menu(query.from_user.id).as_markup())
-
-
 async def channel_handler(message: Message, state: FSMContext):
-    if message.text.startswith("https://t.me/"):
-        invite_link = message.text
-        chat = await bot.export_chat_invite_link(invite_link)
-        channel_id = chat.id
-    elif message.text.startswith("@"):
-        channel_id = message.text
-    else:
-        channel_id = "@" + message.text
-
+    channel_id = message.chat_shared.chat_id
     try:
         member = await bot.get_chat_member(chat_id=channel_id, user_id=bot.id)
         if member.status != "administrator":
@@ -46,14 +38,16 @@ async def channel_handler(message: Message, state: FSMContext):
         else:
             user_obj = await User.get_user(message.from_user.id)
             chat = await bot.get_chat(chat_id=channel_id)
+            channels = user_obj.channel_id
+            if channel_id not in channels:
+                channels.append(channel_id)
             user_data = {
                 "channel_id": user_obj.channel_id + [chat.id]
             }
-            user_update_result = await User.update_user(user_id=message.from_user.id, user_data=user_data)
             time_now = datetime.now(UTC)
             data = {
                 "channel_id": chat.id,
-                "channel_name": chat.username,
+                "channel_name": chat.title,
                 "channel_holder": user_obj.pk,
                 "channel_admins": [message.from_user.id],
                 "delay_point": time_now,
@@ -93,11 +87,12 @@ async def remove_channel_done_handler(query: CallbackQuery):
     user_id = int(query.data.split(":")[1])
     channel_id = int(query.data.split(":")[2])
     result = await Channel.delete_channel_by_id(channel_id)
+    channels_text = await Text.get_add_channel_text(user_id)
     if result:
-        await query.message.edit_text("✅Channel removed from list",
+        await query.message.edit_text(f"✅Channel removed from list\n{channels_text}",
                                       reply_markup=AddChannelMenu.add_channel_menu(user_id).as_markup())
     else:
-        await query.message.edit_text("❌Something went wrong. Please try again later",
+        await query.message.edit_text(f"❌Something went wrong. Please try again later\n{channels_text}",
                                       reply_markup=AddChannelMenu.add_channel_menu(user_id).as_markup())
 
 

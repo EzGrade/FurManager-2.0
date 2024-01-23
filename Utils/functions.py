@@ -326,9 +326,14 @@ class Channel:
         try:
             if serializer.is_valid():
                 serializer.save()
+                user = UserModel.objects.get(
+                    pk=int(channel_data["channel_holder"])
+                )
+                user.channel_id += [channel_data["channel_id"]]
+                user.save()
                 return True
             return False
-        except ValidationError:
+        except ValidationError as e:
             channel = ChannelModel.objects.get(
                 channel_id=channel_data["channel_id"]
             )
