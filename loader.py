@@ -1,3 +1,5 @@
+import os
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
@@ -6,9 +8,10 @@ TOKENS = {
     "PROD": "6955659259:AAFrkK1TrJQSSMhLUy1O2xcEU-DUAJlLeJo"
 }
 
-admins = [1019900002]
+admins = os.environ.get("ADMINS", "1019900002").split(",")
+admins = list(map(int, admins))
 
-DEV = True
+DEV = os.environ.get("DEV", True)
 
 if DEV:
     TOKEN = TOKENS["DEV"]
