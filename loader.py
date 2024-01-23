@@ -11,7 +11,7 @@ TOKENS = {
 admins = os.environ.get("ADMINS", "1019900002").split(",")
 admins = list(map(int, admins))
 
-DEV = os.environ.get("DEV", True)
+DEV = os.environ.get("DEV", True) == "True"
 
 if DEV:
     TOKEN = TOKENS["DEV"]
