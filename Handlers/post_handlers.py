@@ -38,17 +38,16 @@ async def photo_handler(message: Message, state: FSMContext):
 async def finish_handler(message: Message, state: FSMContext):
     data = await state.get_data()
     caption_to_db = message.text.replace(".", "\.") if message.text != "." else ""
-    caption = message.text if message.text != "." else ""
     await state.update_data(caption=caption_to_db)
     keyboard = await PostMenu.get_channels_menu(user_id=message.from_user.id, checked_channels_list=[])
     if data["type"] == "photo":
-        await message.answer_photo(photo=data["photo"], caption=caption,
+        await message.answer_photo(photo=data["photo"], caption=caption_to_db,
                                    reply_markup=keyboard.as_markup(), parse_mode="MarkdownV2")
     elif data["type"] == "gif":
-        await message.answer_animation(animation=data["animation"], caption=caption, reply_markup=keyboard.as_markup(),
+        await message.answer_animation(animation=data["animation"], caption=caption_to_db, reply_markup=keyboard.as_markup(),
                                        parse_mode="MarkdownV2")
     elif data["type"] == "video":
-        await message.answer_video(video=data["video"], caption=caption, reply_markup=keyboard.as_markup(),
+        await message.answer_video(video=data["video"], caption=caption_to_db, reply_markup=keyboard.as_markup(),
                                    parse_mode="MarkdownV2")
 
 
