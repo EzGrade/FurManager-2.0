@@ -1,6 +1,7 @@
 import setup
 
 setup.setup_django()
+from Utils import functions
 import asyncio
 import logging
 
@@ -34,6 +35,11 @@ async def settings_handler(message: Message):
 @dp.message(Command("cancel"))
 async def cancel_handler(message: Message, state: FSMContext):
     await Handlers.cancel_handler(message, state)
+
+
+@dp.message(Command("post"))
+async def post_handler(message: Message):
+    await functions.test()
 
 
 @dp.message(F.content_type.in_({'photo', 'animation', 'video'}), StateFilter(CreatePost.waiting_for_photo))

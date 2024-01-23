@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import re
 import secrets
@@ -14,6 +15,7 @@ from PostsModel.models import PostsModel
 from PostsModel.serializers import PostSerializer
 from UserModel.models import UserModel
 from UserModel.serializers import UserSerializer
+from loader import bot
 
 
 class Post:
@@ -760,3 +762,14 @@ class Text:
             f"ℹ️Channels number: {channels_number}\n"
         )
         return text
+
+
+class Telegram:
+    @staticmethod
+    async def get_link(chat_id: int) -> str:
+        chat = await bot.get_chat(chat_id=chat_id)
+        return chat.type
+
+
+async def test():
+    print(await Telegram.get_link(-1002069224843))
