@@ -695,8 +695,9 @@ class Text:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         template = channel.caption_template
         if template is None:
-            caption = Text.process_caption_links(caption_str)
-            return caption
+            if channel.enhance_links:
+                caption_str = Text.process_caption_links(caption_str)
+            return caption_str
         if "%text%" in template:
             if caption_str is not None:
                 if channel.enhance_links:
