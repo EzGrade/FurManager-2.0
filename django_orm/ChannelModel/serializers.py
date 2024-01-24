@@ -16,7 +16,7 @@ class ChannelSerializer(serializers.Serializer):
     caption_template = serializers.CharField(required=False, max_length=200, allow_blank=True, allow_null=True)
     posts_number = serializers.IntegerField(required=False, default=1)
     enhance_links = serializers.BooleanField(required=False, default=True)
-    active = serializers.BooleanField(required=False, default=False)
+    active = serializers.BooleanField(required=False, default=True)
 
     def create(self, validated_data):
         if ChannelModel.objects.filter(channel_id=validated_data["channel_id"]).first():
