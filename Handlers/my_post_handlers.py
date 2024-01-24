@@ -100,11 +100,27 @@ async def post_now_handler(query: CallbackQuery):
         try:
             caption = await Text.format_caption(post["caption"], channel["id"])
             if post["media_type"] == "photo":
-                await bot.send_photo(chat_id=channel["id"], photo=post["photo"], caption=caption)
+                await bot.send_photo(
+                    chat_id=channel["id"],
+                    photo=post["photo"],
+                    caption=caption,
+                    parse_mode="MarkdownV2"
+                )
+
             elif post["media_type"] == "gif":
-                await bot.send_animation(chat_id=channel["id"], animation=post["photo"], caption=caption)
+                await bot.send_animation(
+                    chat_id=channel["id"],
+                    animation=post["photo"],
+                    caption=caption,
+                    parse_mode="MarkdownV2"
+                )
+
             elif post["media_type"] == "video":
-                await bot.send_video(chat_id=channel["id"], video=post["photo"], caption=caption)
+                await bot.send_video(
+                    chat_id=channel["id"],
+                    video=post["photo"],
+                    caption=caption,
+                    parse_mode="MarkdownV2")
             await query.message.answer(f"Posted to {channel['name']}")
         except TelegramBadRequest:
             failed.append(channel)

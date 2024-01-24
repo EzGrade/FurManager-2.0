@@ -1,4 +1,6 @@
 import asyncio
+import logging
+import typing
 from datetime import datetime, timezone, UTC
 
 from asgiref.sync import sync_to_async
@@ -35,12 +37,16 @@ class AutoPost:
             text: str,
             media_type: str
     ) -> None:
-        if media_type == "gif":
-            await self.bot.send_animation(chat_id=channel_id, animation=image, caption=text, parse_mode="MarkdownV2")
-        elif media_type == "photo":
-            await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text, parse_mode="MarkdownV2")
-        elif media_type == "video":
-            await self.bot.send_video(chat_id=channel_id, video=image, caption=text, parse_mode="MarkdownV2")
+        try:
+            if media_type == "gif":
+                await self.bot.send_animation(chat_id=channel_id, animation=image, caption=text,
+                                              parse_mode="MarkdownV2")
+            elif media_type == "photo":
+                await self.bot.send_photo(chat_id=channel_id, photo=image, caption=text, parse_mode="MarkdownV2")
+            elif media_type == "video":
+                await self.bot.send_video(chat_id=channel_id, video=image, caption=text, parse_mode="MarkdownV2")
+        except Exception as e:
+            print(e)
         await self.__UpdateLastPost(channel_id)
 
     @sync_to_async
@@ -67,7 +73,9 @@ class AutoPost:
             channel_id: int
     ) -> None:
         channel = ChannelModel.objects.get(channel_id=channel_id)
-        channel.last_post = datetime.now(UTC)
+        current = datetime.now(UTC)
+        current = current.replace(second=0)
+        channel.last_post = current
         channel.save()
 
     @staticmethod
@@ -86,7 +94,9 @@ class AutoPost:
     def __GetCurrentTime(
             self
     ) -> int:
-        return self.__DateTimeToUnix(datetime.now(timezone.utc))
+        current = datetime.now(timezone.utc)
+        current = current.replace(second=0)
+        return self.__DateTimeToUnix(current)
 
     @staticmethod
     @sync_to_async
@@ -118,7 +128,7 @@ class AutoPost:
 
     async def __Run(
             self,
-            channels: list = None
+            channels: typing.List[int] = None
     ):
         tasks = []
         for channel in channels:
@@ -133,6 +143,7 @@ class AutoPost:
                 continue
             for _ in range(channel_posts_number):
                 post = await self.__GetPost(channel)
+                print(post, channel)
                 if post is not None:
                     caption = await Text.format_caption(post.caption, channel)
                     task = asyncio.create_task(self.__SendPost(channel, post.photo, caption, post.media_type))
@@ -145,13 +156,15 @@ class AutoPost:
             self
     ):
         print("Auto Posting Started...")
+        logging.basicConfig(level=logging.INFO)
         while True:
             channels = await self.__GetChannels()
             await self.__Run(channels=channels)
-            await asyncio.sleep(45)
+            await asyncio.sleep(30)
 
 
 if __name__ == '__main__':
     print("Starting Auto Posting...")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(AutoPost().Start())
+    logging.basicConfig(level=logging.INFO)
