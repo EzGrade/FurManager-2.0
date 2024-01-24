@@ -141,7 +141,7 @@ class EditSingleChannelMenu:
                             user_id=user_id,
                             page=1
                         ))
-        keyboard.adjust(1, 2, 1)
+        keyboard.adjust(2, 3, 1)
         return keyboard
 
     @staticmethod
@@ -231,12 +231,24 @@ class EditSingleChannelMenu:
                             channel_id=channel_id,
                             delay=curren_delay + 5)
                         )
+        keyboard.button(text="➖1",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            delay=curren_delay - 1)
+                        )
+        keyboard.button(text="➕1",
+                        callback_data=CallbackClasses.EditSingleChannelCallbacks.EditChannelDelayValue(
+                            user_id=user_id,
+                            channel_id=channel_id,
+                            delay=curren_delay + 1)
+                        )
         keyboard.button(text=f"Current: {curren_delay} minutes", callback_data=CallbackClasses.EmptyCallback())
         keyboard.button(text="🔙Back", callback_data=CallbackClasses.EditSingleChannelCallbacks.EditDelayMenu(
             user_id=user_id,
             channel_id=channel_id
         ))
-        keyboard.adjust(2, 2, 1)
+        keyboard.adjust(2, 2, 2, 1)
         return keyboard
 
     @staticmethod
