@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import re
 import secrets
@@ -593,10 +592,10 @@ class Text:
                 f'  ⏳Delay: {channel_obj.channel_delay}\n'
                 f'  🏁Delay start point: {date}\n\n'
                 f'ℹ️Post Info\n'
-                f'  📋Template: {channel_obj.caption_template}\n'
                 f'  📊Posts number: {channel_obj.posts_number}\n'
                 f'  📅Last post: {last_post}\n'
                 f'  📅Next post: {next_post}\n\n'
+                f'  📋Template: {channel_obj.caption_template}\n'
                 f'👥Admins:\n{admins_text}\n\n'
                 f'Active: {"✅" + str(channel_obj.active) if channel_obj.active else "❌" + str(channel_obj.active)}\n'
                 f'Enhance links: {"✅" + str(channel_obj.enhance_links) if channel_obj.enhance_links else "❌" + str(channel_obj.enhance_links)}\n\n')
