@@ -30,11 +30,11 @@ async def edit_channel_delay_value_handler(query: CallbackQuery):
     user_id = int(query.data.split(":")[1])
     channel_id = int(query.data.split(":")[2])
     delay = int(query.data.split(":")[3])
-    if delay < 5 or delay > 180:
+    if delay < 1:
         try:
             keyboard = await EditSingleChannelMenu.get_delay_menu(user_id, channel_id)
             await query.message.edit_text(
-                text="❌Delay value cannot be smaller than 5 and bigger than 180\n⚙️Delay edit menu",
+                text="❌Delay value cannot be smaller than 1 minute\n⚙️Delay edit menu",
                 reply_markup=keyboard.as_markup())
             return
         except TelegramBadRequest:
