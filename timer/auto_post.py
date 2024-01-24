@@ -126,6 +126,11 @@ class AutoPost:
         channel = ChannelModel.objects.get(channel_id=channel_id)
         return channel.posts_number
 
+    def __GetStartOfDay(self) -> int:
+        now = datetime.now(timezone.utc)
+        start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        return self.__DateTimeToUnix(start_of_day)
+
     async def __Run(
             self,
             channels: typing.List[int] = None
@@ -137,6 +142,8 @@ class AutoPost:
             start_point = await self.__GetChannelStartPoint(channel)
             channel_delay = await self.__MinutesToUnix(channel)
             to_compare = last_post if last_post is not None else start_point
+            if self.__GetStartOfDay() - to_compare % channel_delay != 0:
+                to_compare = self.__GetStartOfDay()
             if self.__GetCurrentTime() - to_compare < channel_delay:
                 continue
             if (self.__GetCurrentTime() - to_compare) % channel_delay != 0:
