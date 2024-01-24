@@ -143,7 +143,6 @@ class AutoPost:
                 continue
             for _ in range(channel_posts_number):
                 post = await self.__GetPost(channel)
-                print(post, channel)
                 if post is not None:
                     caption = await Text.format_caption(post.caption, channel)
                     task = asyncio.create_task(self.__SendPost(channel, post.photo, caption, post.media_type))
