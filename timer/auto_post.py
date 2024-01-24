@@ -144,6 +144,8 @@ class AutoPost:
             to_compare = last_post if last_post is not None else start_point
             if to_compare + channel_delay >= self.__GetCurrentTime():
                 continue
+            if to_compare - self.__GetStartOfDay() % channel_delay != 0:
+                continue
             for _ in range(channel_posts_number):
                 post = await self.__GetPost(channel)
                 if post is not None:
