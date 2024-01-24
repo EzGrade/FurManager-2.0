@@ -142,11 +142,7 @@ class AutoPost:
             start_point = await self.__GetChannelStartPoint(channel)
             channel_delay = await self.__MinutesToUnix(channel)
             to_compare = last_post if last_post is not None else start_point
-            if self.__GetStartOfDay() - to_compare % channel_delay != 0:
-                to_compare = self.__GetStartOfDay()
-            if self.__GetCurrentTime() - to_compare < channel_delay:
-                continue
-            if (self.__GetCurrentTime() - to_compare) % channel_delay != 0:
+            if to_compare + channel_delay >= self.__GetCurrentTime():
                 continue
             for _ in range(channel_posts_number):
                 post = await self.__GetPost(channel)
